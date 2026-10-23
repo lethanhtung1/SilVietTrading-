@@ -16,10 +16,12 @@
 <script src="https://unpkg.com/lucide@latest"></script>
 <!-- 2. Khởi tạo kết nối (phải đặt TRƯỚC app.js) -->
 <script>
-   const SUPABASE_URL = 'https://dweuihnqfpinmklvyezq.supabase.co';
-    const SUPABASE_ANON_KEY = 'sb_publishable_YiRLWisNmwnlR150gjQnBQ_Oa4HEbYb'; // Key Publishable của bạn
-  if (window.supabase) {
-        window.dbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    const SUPABASE_URL = 'https://dweuihnqfpinmklvyezq.supabase.co';
+    const SUPABASE_ANON_KEY = 'sb_publishable_YiRLWisNmwnlR150gjQnBQ_Oa4HEbYb';
+    
+    if (window.supabase) {
+        // Gán ngược lại vào window.supabase để app.js gọi đúng hàm .from()
+        window.supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         console.log("Supabase client đã sẵn sàng!");
     } else {
         console.error("Thư viện Supabase chưa được tải từ CDN!");
