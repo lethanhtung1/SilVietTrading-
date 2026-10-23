@@ -484,27 +484,27 @@ function scrollToRFQ() {
     event.preventDefault();
 
     const alertBox = document.getElementById('rfqAlertBox');
-    const companyName = document.getElementById('rfqComp').value.trim();
-    const email = document.getElementById('rfqMail').value.trim();
-    const phone = document.getElementById('rfqTel').value.trim();
-    const incoterm = document.getElementById('rfqIncoterm').value;
-    const productCategory = document.getElementById('rfqProdSelect').value;
-    let supplier = document.getElementById('rfqSupplier') ? document.getElementById('rfqSupplier').value : '';
-    const quantity = document.getElementById('rfqQty').value.trim();
-    const targetMarket = document.getElementById('rfqTargetMarket') ? document.getElementById('rfqTargetMarket').value : '';
-    const shippingMethod = document.getElementById('rfqShippingMethod') ? document.getElementById('rfqShippingMethod').value : '';
-    const details = document.getElementById('rfqDetails').value.trim();
+    const companyName = document.getElementById('rfqComp')?.value.trim() || '';
+    const email = document.getElementById('rfqMail')?.value.trim() || '';
+    const phone = document.getElementById('rfqTel')?.value.trim() || '';
+    const incoterm = document.getElementById('rfqIncoterm')?.value || 'FOB';
+    const productCategory = document.getElementById('rfqProdSelect')?.value || '';
+    let supplier = document.getElementById('rfqSupplier')?.value || '';
+    const quantity = document.getElementById('rfqQty')?.value.trim() || '';
+    const targetMarket = document.getElementById('rfqTargetMarket')?.value || '';
+    const shippingMethod = document.getElementById('rfqShippingMethod')?.value || '';
+    const details = document.getElementById('rfqDetails')?.value.trim() || '';
 
     // Tự động suy ra nhà máy nếu trống
     if (!supplier && productCategory) {
-        const matchedProd = globalProductsForCalc.find(p => 
+        const matchedProd = (typeof globalProductsForCalc !== 'undefined' ? globalProductsForCalc : []).find(p => 
             (p.name_vi || p.name || p.name_en || '').trim() === productCategory
         );
         if (matchedProd && matchedProd.company_id) {
-            const matchedComp = globalCompaniesList.find(c => c.id === matchedProd.company_id);
+            const matchedComp = (typeof globalCompaniesList !== 'undefined' ? globalCompaniesList : []).find(c => c.id === matchedProd.company_id);
             if (matchedComp) supplier = matchedComp.name;
         }
-        if (!supplier && globalCompaniesList.length > 0) {
+        if (!supplier && typeof globalCompaniesList !== 'undefined' && globalCompaniesList.length > 0) {
             supplier = globalCompaniesList[0].name;
         }
     }
@@ -523,8 +523,27 @@ function scrollToRFQ() {
         status: 'pending'
     };
 
+    // Kiểm tra và lấy đúng Supabase client (hỗ trợ cả dbClient lẫn supabase)
+    const supabaseClient = window.dbClient || window.supabase;
+    if (!supabaseClient || typeof supabaseClient.from !== 'function') {
+        console.error('Supabase client chưa được khởi tạo!');
+        if (alertBox) {
+            alertBox.className = "p-4 rounded-xl text-xs font-medium bg-rose-950/80 border border-rose-500/50 text-rose-300 flex items-center gap-3 shadow-lg transition-all";
+            alertBox.innerHTML = `
+                <i data-lucide="alert-circle" class="w-5 h-5 text-rose-400 shrink-0"></i>
+                <div>
+                    <strong class="font-bold block text-rose-200">Lỗi Kết Nối!</strong>
+                    Không tìm thấy client Supabase. Vui lòng kiểm tra lại cấu hình script khởi tạo.
+                </div>
+            `;
+            alertBox.classList.remove('hidden');
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+        }
+        return;
+    }
+
     try {
-        const { data, error } = await window.supabase
+        const { data, error } = await supabaseClient
             .from('rfq_requests')
             .insert([rfqPayload]);
 
@@ -541,14 +560,15 @@ function scrollToRFQ() {
                 </div>
             `;
             alertBox.classList.remove('hidden');
-            lucide.createIcons(); // Render lại icon
+            if (typeof lucide !== 'undefined') lucide.createIcons();
         }
 
         // Reset form sau khi gửi thành công
-        document.getElementById('rfqMainForm').reset();
+        const mainForm = document.getElementById('rfqMainForm');
+        if (mainForm) mainForm.reset();
 
         // Cuộn mượt lên chỗ thông báo nếu cần
-        alertBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        if (alertBox) alertBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 
     } catch (err) {
         console.error('Lỗi khi gửi RFQ:', err.message);
@@ -564,7 +584,7 @@ function scrollToRFQ() {
                 </div>
             `;
             alertBox.classList.remove('hidden');
-            lucide.createIcons();
+            if (typeof lucide !== 'undefined') lucide.createIcons();
         }
     }
 }
