@@ -752,6 +752,56 @@
     </div>
 </footer>
 
-   
+   <!-- Modal Chi Tiết Sản Phẩm -->
+<div id="productDetailModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm transition-opacity duration-300">
+  <div class="relative w-full max-w-3xl bg-slate-900 border border-slate-700 rounded-2xl shadow-2xl overflow-hidden flex flex-col md:flex-row max-h-[90vh]">
+    
+    <!-- Nút Đóng Popup -->
+    <button onclick="closeProductDetailModal()" class="absolute top-3 right-3 z-20 w-8 h-8 flex items-center justify-center rounded-full bg-slate-800/80 hover:bg-slate-700 text-slate-400 hover:text-white transition">
+      ✕
+    </button>
+
+    <!-- Khung Ảnh Bên Trái -->
+    <div class="w-full md:w-1/2 bg-slate-950 flex items-center justify-center p-4 relative min-h-[250px]">
+      <img id="detailProductImage" src="" alt="" class="max-h-72 w-full object-contain">
+      <span id="detailProductTag" class="absolute top-4 left-4 px-2.5 py-1 rounded-md bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 text-[10px] font-bold uppercase tracking-wider backdrop-blur-md">
+        SOURCING
+      </span>
+    </div>
+
+    <!-- Khung Thông Tin Bên Phải -->
+    <div class="w-full md:w-1/2 p-6 flex flex-col justify-between overflow-y-auto space-y-4">
+      <div>
+        <h2 id="detailProductName" class="text-xl font-bold text-white leading-snug"></h2>
+        <p id="detailProductDesc" class="text-slate-400 text-xs mt-2 leading-relaxed"></p>
+        
+        <hr class="border-slate-800 my-4">
+
+        <!-- Bảng Thông Số Specs -->
+        <div class="space-y-2.5 text-xs">
+          <div class="flex justify-between border-b border-slate-800/60 pb-1.5">
+            <span class="text-slate-500">Quy cách:</span>
+            <span id="detailProductPackaging" class="text-slate-200 font-medium">Thùng 10kg / PE Bag</span>
+          </div>
+          <div class="flex justify-between border-b border-slate-800/60 pb-1.5">
+            <span class="text-slate-500">Thông số kỹ thuật:</span>
+            <span id="detailProductSpecs" class="text-slate-200 font-medium">Độ ẩm < 12%</span>
+          </div>
+          <div class="flex justify-between border-b border-slate-800/60 pb-1.5">
+            <span class="text-slate-500">Chứng nhận:</span>
+            <span id="detailProductCerts" class="text-emerald-400 font-bold">FDA, HACCP, ISO 22000</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Hành Động: Chuyển Sang Form Báo Giá -->
+      <div class="pt-2">
+        <button id="detailRfqBtn" type="button" class="w-full py-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs transition duration-200 cursor-pointer shadow-lg shadow-amber-500/20">
+          Yêu Cầu Báo Giá Sản Phẩm Này →
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
 </body>
 </html>

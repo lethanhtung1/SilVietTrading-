@@ -1252,17 +1252,25 @@ async function loadDynamicCategories() {
 }
 // Hàm render thẻ card sản phẩm chuẩn B2B
 function renderProductCard(prod) {
+    const productName = prod.name_vi || prod.name || prod.name_en || prod.product_name || 'Sản phẩm chưa đặt tên';
+    
     return `
         <div class="bg-slate-800/80 border border-slate-700/60 rounded-2xl overflow-hidden hover:border-amber-500/50 transition duration-300 flex flex-col justify-between">
             <div>
-                <div class="relative h-48 overflow-hidden bg-slate-950">
-                    <img src="${prod.image_url || 'https://via.placeholder.com/400x300'}" alt="${prod.name}" class="w-full h-full object-cover hover:scale-105 transition duration-500">
-                    <span class="absolute top-3 right-3 px-2.5 py-1 rounded-md bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 text-[10px] font-bold uppercase tracking-wider backdrop-blur-md">
+                <!-- Bấm vào ảnh để xem Chi Tiết -->
+                <div onclick="openProductDetailModal('${prod.id}')" class="relative h-64 overflow-hidden bg-slate-950 flex items-center justify-center p-2 cursor-pointer group">
+                    <img src="${prod.image_url || 'https://via.placeholder.com/400x300'}" 
+                         alt="${productName}" 
+                         class="w-full h-full object-contain group-hover:scale-105 transition duration-500">
+                    <span class="absolute top-3 right-3 px-2.5 py-1 rounded-md bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 text-[10px] font-bold uppercase tracking-wider backdrop-blur-md z-10">
                         ${prod.tag || 'SOURCING'}
+                    </span>
+                    <span class="absolute bottom-3 left-3 px-2 py-1 rounded bg-slate-900/80 text-slate-300 text-[10px] opacity-0 group-hover:opacity-100 transition duration-200">
+                      🔍 Bấm để xem chi tiết
                     </span>
                 </div>
                 <div class="p-5 space-y-2">
-                    <h3 class="text-white font-bold text-base leading-snug">${prod.name}</h3>
+                    <h3 onclick="openProductDetailModal('${prod.id}')" class="text-white font-bold text-base leading-snug cursor-pointer hover:text-amber-400 transition">${productName}</h3>
                     <p class="text-slate-400 text-xs line-clamp-2">${prod.description || ''}</p>
                 </div>
             </div>
@@ -1296,4 +1304,42 @@ function switchCategoryTab(targetSlug) {
 // Hàm nút Xem thêm
 function loadMoreProducts() {
     alert("Đang mở rộng toàn bộ danh mục sản phẩm B2B...");
+}
+// Biến lưu danh sách sản phẩm tạm thời để tra cứu nhanh khi mở Popup
+window.allProductsData = [];
+
+// Hàm mở Modal Chi Tiết
+function openProductDetailModal(productId) {
+  const product = window.allProductsData.find(p => String(p.id) === String(productId));
+  if (!product) return;
+
+  const productName = product.name_vi || product.name || product.name_en || product.product_name || 'Sản phẩm chưa đặt tên';
+
+  // Gán thông tin vào Modal
+  document.getElementById('detailProductImage').src = product.image_url || 'https://via.placeholder.com/400x300';
+  document.getElementById('detailProductImage').alt = productName;
+  document.getElementById('detailProductName').innerText = productName;
+  document.getElementById('detailProductDesc').innerText = product.description || 'Chưa có thông tin mô tả chi tiết.';
+  document.getElementById('detailProductTag').innerText = product.tag || 'SOURCING';
+
+  // Thông số kỹ thuật (Gán fallback nếu DB chưa có cột)
+  document.getElementById('detailProductPackaging').innerText = product.packaging || 'Thùng carton xuất khẩu';
+  document.getElementById('detailProductSpecs').innerText = product.specs || 'Chuẩn hóa quy cách B2B';
+  document.getElementById('detailProductCerts').innerText = product.certifications || 'FDA, ISO 22000, Halal';
+
+  // Khi bấm nút Báo Giá trên Popup Chi Tiết -> Đóng Popup này & Mở Form RFQ
+  document.getElementById('detailRfqBtn').onclick = function() {
+    closeProductDetailModal();
+    if (typeof openRfqModal === 'function') {
+      openRfqModal(product.id);
+    }
+  };
+
+  // Hiển thị Modal
+  document.getElementById('productDetailModal').classList.remove('hidden');
+}
+
+// Hàm đóng Modal
+function closeProductDetailModal() {
+  document.getElementById('productDetailModal').classList.add('hidden');
 }
