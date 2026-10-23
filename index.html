@@ -20,8 +20,13 @@
     const SUPABASE_ANON_KEY = 'sb_publishable_YiRLWisNmwnlR150gjQnBQ_Oa4HEbYb';
     
     if (window.supabase) {
-        // Gán ngược lại vào window.supabase để app.js gọi đúng hàm .from()
-        window.supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        // Tạo client Supabase
+        const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        
+        // Gán cho cả 2 biến để app.js gọi biến nào cũng nhận diện được
+        window.dbClient = client;
+        window.supabase = client;
+        
         console.log("Supabase client đã sẵn sàng!");
     } else {
         console.error("Thư viện Supabase chưa được tải từ CDN!");
