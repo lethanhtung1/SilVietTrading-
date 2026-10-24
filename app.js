@@ -138,9 +138,10 @@ async function loadDynamicCategories() {
     }
 
     try {
+        // Lấy categories và products kèm theo product_details
         const [catRes, prodRes] = await Promise.all([
             window.dbClient.from('categories').select('*'),
-            window.dbClient.from('products').select('*').order('created_at', { ascending: true })
+            window.dbClient.from('products').select('*, product_details(*)').order('created_at', { ascending: true })
         ]);
 
         if (catRes.error) throw catRes.error;
@@ -148,6 +149,9 @@ async function loadDynamicCategories() {
 
         const categories = catRes.data || [];
         const products = prodRes.data || [];
+
+        // Đồng bộ lưu biến toàn cục cho Popup
+        window.allProductsData = products;
 
         if (categories.length === 0) {
             tabsContainer.innerHTML = `<p class="text-slate-500 text-sm">Không có dữ liệu danh mục.</p>`;
@@ -160,7 +164,6 @@ async function loadDynamicCategories() {
         categories.forEach((cat, index) => {
             const isFirst = index === 0;
 
-            // Tạo nút Tab
             const btn = document.createElement('button');
             btn.type = 'button';
             btn.id = `tabBtn-${cat.slug}`;
@@ -173,7 +176,6 @@ async function loadDynamicCategories() {
             btn.innerHTML = `<span>${cat.icon || '📦'}</span> ${cat.name}`;
             tabsContainer.appendChild(btn);
 
-            // Tạo khung chứa sản phẩm tương ứng
             const gridDiv = document.createElement('div');
             gridDiv.id = `catContent-${cat.slug}`;
             gridDiv.className = `cat-content grid sm:grid-cols-2 lg:grid-cols-3 gap-6 ${isFirst ? '' : 'hidden'}`;
@@ -202,33 +204,48 @@ async function loadDynamicCategories() {
 
 // ================= HÀM XỬ LÝ POPUP CHI TIẾT =================
 
-// Hàm mở Popup Chi Tiết Mẫu Pro
 function openProductDetailModal(productId) {
     const product = (window.allProductsData || globalProductsForCalc || []).find(p => String(p.id) === String(productId));
     if (!product) return;
 
-    const name = product.name_vi || product.name || product.name_en || 'Sản phẩm xuất khẩu';
-    const packing = product.packaging || product.specs_packing || 'Thùng 10kg / PE Bag';
-    const detail = product.specs_detail || product.specs || '2mm';
-    const cert = product.specs_cert || product.certifications || 'FDA, ISO 22000';
+    const name = product.name_vi || product.name_en || product.name || 'Sản phẩm xuất khẩu';
+    const packaging = product.packaging || 'Thùng 10kg / PE Bag';
+    const specsDetail = product.specs_detail || product.specs || 'Chuẩn xuất khẩu B2B';
+    const specsCert = product.specs_cert || 'FDA, ISO 22000';
     const img = product.image_url || 'https://images.unsplash.com/photo-1612927601601-6638404737ce?auto=format&fit=crop&w=600&q=80';
 
-    // Đổ dữ liệu lên các thành phần trong Modal
+    // Lấy dữ liệu từ bảng product_details (join 1-1)
+    const details = Array.isArray(product.product_details) ? product.product_details[0] : product.product_details;
+    
+    // Ưu tiên lấy carton_size từ bảng product_details, nếu chưa có thì dùng giá trị mặc định
+    const cartonSize = details?.carton_size || '37 x 45 x 35 cm';
+
+    const ingredients = details?.ingredients || 'Gạo, Nước, Tinh bột sắn, Muối (Đang cập nhật)';
+    const usage = details?.usage || 'Chế biến theo tiêu chuẩn hướng dẫn trên bao bì.';
+    const storage = details?.storage || 'Bảo quản nơi khô ráo, thoáng mát, tránh ánh nắng trực tiếp.';
+
+    // Đổ dữ liệu lên Modal Pro
     document.getElementById('detailProductImage').src = img;
     document.getElementById('detailThumb1').src = img;
     document.getElementById('detailProductName').innerText = name;
-    document.getElementById('detailProductTag').innerText = product.tag || 'SOURCING';
+    document.getElementById('detailProductTag').innerText = product.category || 'SOURCING';
     
-    document.getElementById('detailProductType').innerText = product.classification || detail;
-    document.getElementById('detailProductPackaging').innerText = packing;
-    document.getElementById('detailProductCartonSize').innerText = product.carton_size || '37 x 45 x 35 cm';
-    document.getElementById('detailProductBarcode').innerText = product.barcode || cert;
+    // Đổ các thông số kỹ thuật
+    document.getElementById('detailProductType').innerText = specsDetail;
+    document.getElementById('detailProductPackaging').innerText = packaging;
+    document.getElementById('detailProductCartonSize').innerText = cartonSize;
+    document.getElementById('detailProductBarcode').innerText = specsCert;
 
-    // Chi tiết sản phẩm phía dưới
-    document.getElementById('detailProductIngredients').innerText = product.ingredients || 'Gạo (84.8%), Nước (12%), Tinh bột sắn (3%), Muối (0.2%)';
-    document.getElementById('detailProductStorage').innerText = product.storage || 'Bảo quản nơi khô ráo, thoáng mát, tránh ánh nắng mặt trời trực tiếp.';
+    // Đổ thông tin chi tiết sản phẩm phía dưới
+    document.getElementById('detailProductIngredients').innerText = ingredients;
+    document.getElementById('detailProductStorage').innerText = storage;
 
-    // Nút bấm chuyển sang Form RFQ
+    const usageContainer = document.getElementById('detailProductUsage');
+    if (usageContainer) {
+        const usageList = usage.split('\n').map(item => `<li>${item}</li>`).join('');
+        usageContainer.innerHTML = usageList || `<li>${usage}</li>`;
+    }
+
     const rfqBtn = document.getElementById('detailRfqBtn');
     if (rfqBtn) {
         rfqBtn.onclick = function() {
@@ -237,12 +254,10 @@ function openProductDetailModal(productId) {
         };
     }
 
-    // Hiển thị Modal
     const modal = document.getElementById('productDetailModal');
     if (modal) modal.classList.remove('hidden');
 }
 
-// Hàm đóng Modal
 function closeProductDetailModal() {
     const modal = document.getElementById('productDetailModal');
     if (modal) modal.classList.add('hidden');
@@ -268,7 +283,7 @@ function renderProductCard(prod) {
                     <span class="absolute top-3 right-3 px-2.5 py-1 rounded-md bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 text-[10px] font-bold uppercase tracking-wider backdrop-blur-md">
                         ${prod.tag || 'SOURCING'}
                     </span>
-                    <span class="absolute bottom-2 left-2 bg-slate-900/80 text-slate-300 text-[10px] px-2 py-0.5 rounded opacity-0 group-hover:opacity-100 transition z-10">🔍 Bấm xem chi tiết</span>
+                    <span class="absolute bottom-2 left-2 bg-slate-900/80 text-slate-300 text-[10px] px-2 py-0.5 rounded opacity-0 group-hover:opacity-100 transition z-10"> Bấm xem chi tiết</span>
                 </div>
 
                 <!-- Click vào tiêu đề để mở Popup chi tiết -->
@@ -299,19 +314,23 @@ function renderProductCard(prod) {
 // Tải sản phẩm vào CBM Calculator và Form RFQ
 async function loadProductsIntoCalculator() {
     try {
+        // Lấy sản phẩm kèm theo bảng chi tiết product_details
         const { data: products, error } = await window.dbClient
             .from('products')
-            .select('*')
+            .select('*, product_details(*)')
             .order('created_at', { ascending: true });
 
         if (error) throw error;
+        
+        // Lưu toàn bộ vào biến toàn cục để Popup tra cứu dữ liệu
         globalProductsForCalc = products || [];
+        window.allProductsData = products || [];
 
         const calcSelectEl = document.getElementById('calcProductType');
         const rfqSelectEl = document.getElementById('rfqProdSelect');
 
         if (calcSelectEl) calcSelectEl.innerHTML = '';
-        if (rfqSelectEl) rfqSelectEl.innerHTML = '<option value="">-- Chọn sản phẩm quan tâm --</option>';
+        if (rfqSelectEl) rfqSelectEl.innerHTML = '<option value=""> Chọn sản phẩm quan tâm </option>';
 
         globalProductsForCalc.forEach((item, index) => {
             const productName = (item.name_vi || item.name || item.name_en || 'Sản phẩm xuất khẩu').trim();
@@ -339,7 +358,6 @@ async function loadProductsIntoCalculator() {
         console.error('Lỗi tải sản phẩm cho calculator:', err.message);
     }
 }
-
 // Tính toán CBM & Container
 function runCbmCalculator() {
     const selectEl = document.getElementById('calcProductType');
@@ -430,7 +448,7 @@ async function loadAllSystemData() {
         // Đổ dữ liệu vào Quick Finder sản phẩm (Hero)
         const finderProdSelect = document.getElementById('finderProductSelect');
         if (finderProdSelect && globalProductsForCalc.length > 0) {
-            finderProdSelect.innerHTML = '<option value="">-- Chọn sản phẩm OEM / Sourcing --</option>';
+            finderProdSelect.innerHTML = '<option value=""> Chọn sản phẩm OEM / Sourcing </option>';
             globalProductsForCalc.forEach((item, index) => {
                 const productName = (item.name_vi || item.name || item.name_en || 'Sản phẩm').trim();
                 const opt = document.createElement('option');
@@ -443,7 +461,7 @@ async function loadAllSystemData() {
         // Đổ dữ liệu nhà máy vào Form RFQ
         const rfqSupplierEl = document.getElementById('rfqSupplier');
         if (rfqSupplierEl) {
-            rfqSupplierEl.innerHTML = '<option value="">-- Chọn nhà máy đối tác --</option>';
+            rfqSupplierEl.innerHTML = '<option value="">Chọn nhà máy đối tác </option>';
             globalCompaniesList.forEach((comp) => {
                 const opt = document.createElement('option');
                 opt.value = comp.name;
@@ -465,7 +483,7 @@ function handleQuickProductChange() {
 
     const selectedIndex = prodSelect.value;
     if (selectedIndex === "") {
-        supplierSelect.innerHTML = '<option value="">-- Vui lòng chọn sản phẩm trước --</option>';
+        supplierSelect.innerHTML = '<option value=""> Vui lòng chọn sản phẩm trước </option>';
         handleQuickSupplierChange();
         return;
     }
@@ -512,7 +530,7 @@ function handleQuickSupplierChange() {
 
     if (!supplierSelect || supplierSelect.value === "" || currentFilteredCompanies.length === 0) {
         if (certsDisplayEl) certsDisplayEl.innerHTML = '<span class="text-[10px] text-slate-400">Chọn nhà máy để xem chứng chỉ...</span>';
-        if (marketSelect) marketSelect.innerHTML = '<option value="">-- Chọn nhà máy để xem thị trường --</option>';
+        if (marketSelect) marketSelect.innerHTML = '<option value="">Chọn nhà máy để xem thị trường </option>';
         return;
     }
 
