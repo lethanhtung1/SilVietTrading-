@@ -91,14 +91,14 @@
     </button>
 
     <!-- Cụm chữ nghệ thuật phóng to, không khung, nền đen tuyền -->
-    <div style="position: relative; z-index: 10; display: flex; align-items: center; justify-content: center; text-align: center; padding: 0 20px;">
-        <h1 style="font-family: 'French Script MT', 'Brush Script MT', cursive, serif; font-size: clamp(45px, 7vw, 75px); color: #ffffff; font-weight: normal; margin: 0; display: flex; gap: 20px; white-space: nowrap;">
-            <!-- Cụm trái trượt ngắn chậm rãi -->
-            <span style="display: inline-block; opacity: 0; animation: slideLeft 1.4s cubic-bezier(0.16, 1, 0.3, 1) 0.4s forwards;">Welcome to</span>
-            <!-- Cụm phải trượt ngắn chậm rãi -->
-            <span style="display: inline-block; opacity: 0; animation: slideRight 1.4s cubic-bezier(0.16, 1, 0.3, 1) 0.6s forwards;">our SilViet Trading</span>
-        </h1>
-    </div>
+   <div style="position: relative; z-index: 10; display: flex; align-items: center; justify-content: center; text-align: center; padding: 0 20px;">
+    <h1 style="font-family: 'French Script MT', 'Brush Script MT', cursive, serif; font-size: clamp(45px, 7vw, 75px); color: #ffffff !important; font-weight: normal; margin: 0; display: flex; gap: 20px; white-space: nowrap;">
+        <!-- Cụm trái -->
+        <span style="display: inline-block; color: #ffffff !important; animation: slideLeftFade 1.4s cubic-bezier(0.16, 1, 0.3, 1) 0.4s forwards;">Welcome to</span>
+        <!-- Cụm phải -->
+        <span style="display: inline-block; color: #ffffff !important; animation: slideRightFade 1.4s cubic-bezier(0.16, 1, 0.3, 1) 0.6s forwards;">our SilViet Trading</span>
+    </h1>
+</div>
 </div>
 
 <!-- Inline CSS cho hiệu ứng trượt chữ -->
@@ -179,6 +179,8 @@
                     <i data-lucide="languages" class="w-3.5 h-3.5 text-brand-emeraldLight"></i>
                     <span id="langLabel" class="font-bold">VI / EN</span>
                 </button>
+                <!-- Nút chuyển đổi Chế độ Sáng / Tối -->
+
             </div>
         </div>
     </div>
@@ -224,6 +226,7 @@
                     <i data-lucide="file-text" class="w-4 h-4"></i>
                     <span data-i18n="btn_rfq">Gửi Yêu Cầu Báo Giá (RFQ)</span>
                 </button>
+                
             </div>
 
             <!-- Mobile Menu Toggle -->
