@@ -3,44 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  
     <title>SilViet Global Trade - B2B Sourcing & Export Connector</title>
+    
+    <!-- SEO & Verification -->
     <meta name="google-site-verification" content="Rmol4DHgOm4TY90tdpiz0wHTq0eAQBq7JUbk8YEPblQ" />
     <meta name="description" content="SilViet Trading - Nền tảng B2B Sourcing & Export kết nối nhà máy sản xuất và nhà mua hàng quốc tế tại Việt Nam.">
     <link rel="icon" type="image/x-icon" href="./favicon.ico">
-    <!-- Tailwind CSS CDN -->
-     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<!-- 1. Thư viện Supabase -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-<!-- 2. Thư viện Lucide Icons (Đảm bảo phải có dòng này) -->
-<script src="https://unpkg.com/lucide@latest"></script>
-<!-- 2. Khởi tạo kết nối (phải đặt TRƯỚC app.js) -->
-<script>
-    const SUPABASE_URL = 'https://dweuihnqfpinmklvyezq.supabase.co';
-    const SUPABASE_ANON_KEY = 'sb_publishable_YiRLWisNmwnlR150gjQnBQ_Oa4HEbYb';
-    
-    if (window.supabase) {
-        // Tạo client Supabase
-        const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-        
-        // Gán cho cả 2 biến để app.js gọi biến nào cũng nhận diện được
-        window.dbClient = client;
-        window.supabase = client;
-        
-        console.log("Supabase client đã sẵn sàng!");
-    } else {
-        console.error("Thư viện Supabase chưa được tải từ CDN!");
-    }
-</script>
-<script src="https://unpkg.com/aos@next/dist/aos.js"></script>
-  <script src="app.js"></script>
+    <!-- 1. Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
-
-
+    <!-- 2. Tailwind CSS CDN & Config -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
         tailwind.config = {
             theme: {
@@ -64,10 +38,11 @@
             }
         }
     </script>
-    <!-- Inter Font -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <!-- Lucide Icons -->
-    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- 3. External Animation & Icons CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+
+    <!-- Custom Inline Styles -->
     <style>
         body { font-family: 'Inter', sans-serif; }
         .glass-panel {
@@ -79,9 +54,29 @@
             backdrop-filter: blur(8px);
         }
     </style>
-    <!-- AOS CSS & JS -->
-<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
 
+    <!-- 4. Core JavaScript Libraries (Chỉ gọi 1 lần duy nhất) -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://unpkg.com/aos@next/dist/aos.js" defer></script>
+
+    <!-- 5. Supabase Initialization -->
+    <script>
+        const SUPABASE_URL = 'https://dweuihnqfpinmklvyezq.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_YiRLWisNmwnlR150gjQnBQ_Oa4HEbYb';
+        
+        if (window.supabase) {
+            const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            window.dbClient = client;
+            window.supabase = client;
+            console.log("Supabase client đã sẵn sàng!");
+        } else {
+            console.error("Thư viện Supabase chưa được tải từ CDN!");
+        }
+    </script>
+
+    <!-- 6. Main App Script (Dùng defer để tải sau khi HTML đã sẵn sàng) -->
+    <script src="app.js" defer></script>
 </head>
 <body class="bg-slate-900 text-slate-100 antialiased selection:bg-brand-emerald selection:text-white flex flex-col min-h-screen">
 <!-- ================= INTRO SPLASH SCREEN (NỀN ĐEN TUYỀN, KHÔNG KHUNG, CHỮ TO) ================= -->
@@ -330,7 +325,7 @@
                                         Nhóm Hàng Cần Sourcing / OEM
                                     </label>
                                     <div class="relative">
-                                        <select id="finderProductSelect" onchange="handleQuickProductChange()" class="w-full bg-slate-950/90 border border-slate-700 hover:border-brand-emerald/60 text-white rounded-xl p-3 text-xs outline-none focus:border-brand-emerald focus:ring-1 focus:ring-brand-emerald transition appearance-none cursor-pointer">
+                                        <select id="finderProductSelect" onchange="handleQuickProductChange()" aria-label="Chọn sản phẩm OEM và Sourcing" class="w-full bg-slate-950/90 border border-slate-700 hover:border-brand-emerald/60 text-white rounded-xl p-3 text-xs outline-none focus:border-brand-emerald focus:ring-1 focus:ring-brand-emerald transition appearance-none cursor-pointer">
                                             <option value=""> Đang tải sản phẩm... </option>
                                         </select>
                                         <div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
@@ -346,7 +341,7 @@
                                         Chọn Nhà Máy Đối Tác (Verified Supplier)
                                     </label>
                                     <div class="relative">
-                                        <select id="quickSupplierSelect" onchange="handleQuickSupplierChange()" class="w-full bg-slate-950/90 border border-slate-700 hover:border-brand-emerald/60 text-white rounded-xl p-3 text-xs outline-none focus:border-brand-emerald focus:ring-1 focus:ring-brand-emerald transition appearance-none cursor-pointer">
+                                        <select id="quickSupplierSelect" onchange="handleQuickSupplierChange()" aria-label="Chọn nhà máy đối tác" class="w-full bg-slate-950/90 border border-slate-700 hover:border-brand-emerald/60 text-white rounded-xl p-3 text-xs outline-none focus:border-brand-emerald focus:ring-1 focus:ring-brand-emerald transition appearance-none cursor-pointer">
                                             <option value="">Vui lòng chọn sản phẩm trước</option>
                                         </select>
                                         <div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
@@ -370,7 +365,7 @@
                                         Thị Trường Xuất Khẩu Đích
                                     </label>
                                     <div class="relative">
-                                        <select id="quickTargetMarket" class="w-full bg-slate-950/90 border border-slate-700 hover:border-brand-emerald/60 text-white rounded-xl p-3 text-xs outline-none focus:border-brand-emerald focus:ring-1 focus:ring-brand-emerald transition appearance-none cursor-pointer">
+                                        <select id="quickTargetMarket" aria-label="Chọn thị trường xuất khẩu đích" class="w-full bg-slate-950/90 border border-slate-700 hover:border-brand-emerald/60 text-white rounded-xl p-3 text-xs outline-none focus:border-brand-emerald focus:ring-1 focus:ring-brand-emerald transition appearance-none cursor-pointer">
                                             <option value=""> Chọn nhà máy để xem thị trường phù hợp </option>
                                         </select>
                                         <div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
@@ -449,18 +444,18 @@
                     
                     <div>
     <label class="block text-slate-300 font-semibold mb-1" data-i18n="c1_select_prod">Dòng Sản Phẩm Sourcing:</label>
-    <select id="calcProductType" onchange="runCbmCalculator()" class="w-full bg-slate-950 border border-slate-700 text-white rounded-xl p-3 outline-none focus:border-brand-emerald">
+    <select id="calcProductType" onchange="runCbmCalculator()" aria-label="Chọn dòng sản phẩm tính CBM" class="w-full bg-slate-950 border border-slate-700 text-white rounded-xl p-3 outline-none focus:border-brand-emerald">
         <option value="">Đang tải danh sách sản phẩm từ cơ sở dữ liệu...</option>
     </select>
 </div>
 
                     <div>
                         <label class="block text-slate-300 font-semibold mb-1" data-i18n="c1_carton_qty">Tổng số Thùng Carton (hoặc Tổng số Đôi giày):</label>
-                        <input type="number" id="calcCartonInput" value="1000" min="50" max="50000" oninput="runCbmCalculator()" class="w-full bg-slate-950 border border-slate-700 text-white rounded-xl p-3 outline-none focus:border-brand-emerald font-bold">
+                        <input type="number" id="calcCartonInput" value="1000" min="50" max="50000" oninput="runCbmCalculator()" aria-label="Tổng số Thùng Carton" class="w-full bg-slate-950 border border-slate-700 text-white rounded-xl p-3 outline-none focus:border-brand-emerald font-bold">
                     </div>
 <div>
     <label class="block text-slate-300 font-semibold mb-1">Phương Thức Vận Chuyển Mong Muốn:</label>
-    <select id="calcShippingMethod" class="w-full bg-slate-950 border border-slate-700 text-white rounded-xl p-3 outline-none focus:border-brand-emerald">
+    <select id="calcShippingMethod" aria-label="Chọn phương thức vận chuyển CBM" class="w-full bg-slate-950 border border-slate-700 text-white rounded-xl p-3 outline-none focus:border-brand-emerald">
         <option value="FCL_20">FCL - Container 20ft (Đường biển)</option>
         <option value="FCL_40" selected>FCL - Container 40ft HC (Đường biển - Phổ biến)</option>
         <option value="LCL">LCL - Hàng lẻ ghép container (Đường biển)</option>
@@ -574,7 +569,7 @@
                     </div>
                     <div>
                         <label class="block font-bold text-slate-300 mb-1" data-i18n="rfq_incoterm">Điều Kiện Giao Hàng (Incoterms)</label>
-                        <select id="rfqIncoterm" class="w-full bg-slate-950 border border-slate-700 rounded-xl p-3 text-white focus:border-brand-emerald outline-none">
+                        <select id="rfqIncoterm" aria-label="Chọn điều kiện giao hàng Incoterms" class="w-full bg-slate-950 border border-slate-700 rounded-xl p-3 text-white focus:border-brand-emerald outline-none">
                             <option value="FOB">FOB (Giao tại Cảng Cát Lái / Hải Phòng)</option>
                             <option value="CIF">CIF (Giao tới Cảng Đích của Buyer)</option>
                             <option value="EXW">EXW (Nhận hàng tại Xưởng Việt Nam)</option>
@@ -586,13 +581,13 @@
                 <div class="grid sm:grid-cols-2 gap-4">
                     <div>
                         <label class="block font-bold text-slate-300 mb-1" data-i18n="rfq_prod_select">Sản Phẩm Quan Tâm *</label>
-                        <select id="rfqProdSelect" required onchange="handleRFQProductChange()" class="w-full bg-slate-950 border border-slate-700 rounded-xl p-3 text-white focus:border-brand-emerald outline-none">
+                        <select id="rfqProdSelect" aria-label="Chọn sản phẩm quan tâm RFQ" required onchange="handleRFQProductChange()" class="w-full bg-slate-950 border border-slate-700 rounded-xl p-3 text-white focus:border-brand-emerald outline-none">
                             <option value="">-- Đang tải sản phẩm... --</option>
                         </select>
                     </div>
                     <div>
                         <label class="block font-bold text-brand-emeraldLight mb-1">🏢 Nhà Máy Sản Xuất (Verified Supplier)</label>
-                        <select id="rfqSupplier" class="w-full bg-slate-950 border border-slate-700 rounded-xl p-3 text-white focus:border-brand-emerald outline-none">
+                        <select id="rfqSupplier" aria-label="Chọn nhà máy sản xuất RFQ" class="w-full bg-slate-950 border border-slate-700 rounded-xl p-3 text-white focus:border-brand-emerald outline-none">
                             <option value="">-- Đang tải nhà máy... --</option>
                         </select>
                     </div>
@@ -606,7 +601,7 @@
                     </div>
                     <div>
                         <label class="block font-bold text-brand-emeraldLight mb-1">🌍 Thị Trường Xuất Khẩu Đích</label>
-                        <select id="rfqTargetMarket" class="w-full bg-slate-950 border border-slate-700 rounded-xl p-3 text-white focus:border-brand-emerald outline-none">
+                        <select id="rfqTargetMarket" aria-label="Chọn thị trường xuất khẩu RFQ" class="w-full bg-slate-950 border border-slate-700 rounded-xl p-3 text-white focus:border-brand-emerald outline-none">
                             <option value="Mỹ / Canada (FDA)">Mỹ / Canada (FDA)</option>
                             <option value="Châu Âu (EU Standard)">Châu Âu (EU Standard)</option>
                             <option value="Trung Đông (Halal Cert)">Trung Đông (Halal Cert)</option>
@@ -618,7 +613,7 @@
                 <!-- Hàng 5: Phương thức vận chuyển -->
                 <div>
                     <label class="block font-bold text-slate-300 mb-1">Phương Thức Vận Chuyển Mong Muốn</label>
-                    <select id="rfqShippingMethod" class="w-full bg-slate-950 border border-slate-700 rounded-xl p-3 text-white focus:border-brand-emerald outline-none">
+                    <select id="rfqShippingMethod" aria-label="Chọn phương thức vận chuyển RFQ" class="w-full bg-slate-950 border border-slate-700 rounded-xl p-3 text-white focus:border-brand-emerald outline-none">
                         <option value="FCL - Container 40ft HC">FCL - Container 40ft HC (Đường biển)</option>
                         <option value="FCL - Container 20ft">FCL - Container 20ft (Đường biển)</option>
                         <option value="LCL - Hàng lẻ ghép container">LCL - Hàng lẻ ghép container (Đường biển)</option>
