@@ -11,22 +11,166 @@ const fallbackCompanies = [
 
 const i18nData = {
     vi: {
-        top_network: "SilViet Sourcing Hub: Ho Chi Minh • Binh Duong • Dong Nai • Hanoi",
+        top_network: "SilViet Sourcing Hub: Ho Chi Minh • Binh Duong",
         nav_products: "Sản Phẩm Chủ Lực",
         nav_calc: "Tính CBM & Container",
         nav_services: "Dịch Vụ OEM/ODM",
         nav_rfq: "Liên Hệ RFQ",
-        btn_rfq: "Gửi Yêu Cầu Báo Giá (RFQ)"
+        btn_rfq: "Gửi Yêu Cầu Báo Giá (RFQ)",
+        
+        // Hero Section
+        hero_badge: "B2B Sourcing & Export Connector - Vietnam to Worldwide",
+        hero_title_1: "Cầu Nối Xuất Khẩu B2B",
+        hero_title_2: "Nông Sản Khô, Đồ Uống & Giày Dép Việt",
+        hero_sub: "SilViet kết nối trực tiếp các nhà mua hàng quốc tế với mạng lưới nhà máy chuẩn ISO/HACCP/FDA tại Việt Nam: Hủ tiếu - Bún phở sấy khô, Nước dừa đóng lon & Giày dép xuất khẩu OEM/ODM.",
+        stat_factories: "Nhà Máy Đối Tác",
+        stat_containers: "Container / Năm",
+        stat_qc: "Kiểm Định QC Chuẩn",
+        
+        // Quick Finder
+        finder_title: "Quick Sourcing Finder",
+        finder_sub: "Tra cứu thông số, Nhà máy & nhận báo giá trực tiếp",finder_label_1: "Nhóm Hàng Cần Sourcing / OEM",
+        finder_select_prod: "Chọn sản phẩm OEM / Sourcing",
+        finder_label_2: "Chọn Nhà Máy Đối Tác (Verified Supplier)",
+        finder_default_prod: "Vui lòng chọn sản phẩm trước",
+        finder_label_certs: "Chứng chỉ & Tiêu chuẩn nhà máy:",
+        finder_default_certs: "Chọn nhà máy để xem chứng chỉ...",
+        finder_label_3: "Thị Trường Xuất Khẩu Đích",
+        finder_default_market: "Chọn nhà máy để xem thị trường phù hợp",
+        finder_btn_submit: "Kết Nối Nhà Máy & Nhận RFQ",
+        cat_badge: "Chủ Lực Xuất Khẩu",
+        cat_title: "Danh Mục Sản Phẩm Kết Nối B2B",
+        cat_desc: "Tất cả sản phẩm đều được chuẩn hóa bao bì, nhãn mác đa ngôn ngữ và hồ sơ chứng nhận đầy đủ.",
+        
+        // Calculator
+        calc_tag: "Công Cụ Ước Tính B2B",
+        calc_title: "Tính Thể Tích (CBM) & Tải Trọng Container",
+        calc_sub: "Hỗ trợ đối tác tính toán số lượng Container 20ft / 40HC cần thiết cho đơn hàng.",
+        c1_head: "1. Chọn Mặt Hàng & Số Lượng",
+        c1_select_prod: "Dòng Sản Phẩm Sourcing:",
+        c1_carton_qty: "Tổng số Thùng Carton (hoặc Tổng số Đôi giày):",
+        c2_head: "2. Kết Quả Ước Tính Xuất Khẩu",
+        res_cbm: "Tổng Thể Tích (CBM):",
+        res_gw: "Tổng Khối Lượng (GW Kg):",
+        btn_calc_rfq: "Gửi Yêu Cầu Báo Giá Theo Số Lượng Này",
+
+        // Services
+        serv_sub: "Dịch Vụ Gia Giá Trị Gia Tăng",
+        serv_title: "Dịch Vụ Hỗ Trợ Dành Cho B2B Buyers",
+        s1_title: "Gia Công OEM & Private Labeling",
+        s1_desc: "In ấn thiết kế bao bì thương hiệu riêng cho hủ tiếu, bún phở, nhãn lon nước dừa & ép logo thương hiệu trên giày dép theo chính xác nhận diện của khách hàng.",
+        s2_title: "Kiểm Định QC & Đóng Gói Chuẩn Export",
+        s2_desc: "Đội ngũ kỹ sư QC giám sát dây chuyền, đo lường độ ẩm thực phẩm khô, đo độ bám dính đế giày và test độ bền thùng carton chống móp vỡ đường biển.",
+        s3_title: "Thủ Tục Hải Quan, C.O & Freight",
+        s3_desc: "Xử lý toàn bộ chứng từ kiểm dịch thực vật (Phytosanitary), chứng nhận FDA, C/O ưu đãi thuế xuất khẩu và booking container giao hàng FOB/CIF/DDP.",
+
+        // RFQ
+        rfq_tag: "Official RFQ Submission",
+        rfq_title: "Gửi Yêu Cầu Báo Giá Sourcing & Export",
+        rfq_sub: "Điền thông tin bên dưới để nhận bảng thông số Specs & Báo giá chi tiết từ SilViet Sourcing.",
+        rfq_company: "Tên Công Ty / Doanh Nghiệp Buyers *",
+        rfq_email: "Email Liên Hệ Chính *",
+        rfq_phone: "Số Điện Thoại / WhatsApp / WeChat *",
+        rfq_incoterm: "Điều Kiện Giao Hàng (Incoterms)",
+        rfq_prod_select: "Sản Phẩm Quan Tâm *",
+        rfq_qty: "Sản Lượng Đơn Hàng Dự Kiến *",
+        rfq_details: "Yêu Cầu Chi Tiết (Yêu cầu Private Label, Chứng nhận đặc thù...)",
+        btn_submit_rfq: "Gửi Yêu Cầu Báo Giá Chính Thức",
+
+        // Footer
+        foot_desc: "Đơn vị kết nối thương mại & xuất khẩu B2B thuộc SilViet Group. Chuyên dòng thực phẩm khô, nước dừa đóng lon & giày dép xuất khẩu sang EU, US, Middle East.",
+        foot_products: "Dòng Sản Phẩm Chủ Lực",
+        foot_links: "Điều Hướng",
+        foot_contact: "Trụ Sở Sourcing Hub"
     },
     en: {
-        top_network: "SilViet Sourcing Hub: Ho Chi Minh • Binh Duong • Dong Nai • Hanoi",
+        top_network: "SilViet Sourcing Hub: Ho Chi Minh • Binh Duong",
         nav_products: "Core Products",
         nav_calc: "CBM & Container Calc",
         nav_services: "OEM/ODM Services",
         nav_rfq: "Inquire RFQ",
-        btn_rfq: "Request a Quote (RFQ)"
+        btn_rfq: "Request a Quote (RFQ)",
+        
+        // Hero Section
+        hero_badge: "B2B Sourcing & Export Connector - Vietnam to Worldwide",
+        hero_title_1: "B2B Export Connector",
+        hero_title_2: "Dry Foods, Beverages & Footwear from Vietnam",
+        hero_sub: "SilViet directly connects international buyers with ISO/HACCP/FDA-certified manufacturing networks in Vietnam: Dried Rice Noodles, Canned Coconut Water & OEM/ODM Footwear.",
+        stat_factories: "Verified Factories",
+        stat_containers: "Containers / Year",
+        stat_qc: "Standard QC Audit",
+        
+        // Quick Finder
+        finder_title: "Quick Sourcing Finder",
+        finder_sub: "Look up specs, factories & get instant quotes",
+        finder_label_1: "Sourcing / OEM Product Category",
+        finder_select_prod: "Select OEM / Sourcing product",
+        finder_label_2: "Verified Partner Supplier",
+        finder_default_prod: "Please select a product first",
+        finder_label_certs: "Factory Certifications & Standards:",
+        finder_default_certs: "Select a factory to view certifications...",
+        finder_label_3: "Target Export Market",
+        finder_default_market: "Select a factory to view matching markets",
+        finder_btn_submit: "Connect Factory & Get RFQ",
+        cat_badge: "Core Export Highlights",
+        cat_title: "B2B Connected Product Catalog",
+        cat_desc: "All products feature standardized multi-language packaging, labeling, and complete certification records.",
+        
+        // Calculator
+        calc_tag: "B2B Estimation Tool",
+        calc_title: "CBM Volume & Container Load Calculator",
+        calc_sub: "Help partners estimate the required 20ft / 40HC containers for orders.",
+        c1_head: "1. Select Product & Quantity",
+        c1_select_prod: "Sourcing Product Line:",
+        c1_carton_qty: "Total Carton Boxes (or Total Shoe Pairs):",
+        c2_head: "2. Export Estimation Results",
+        res_cbm: "Total Volume (CBM):",
+        res_gw: "Total Gross Weight (GW Kg):",
+        btn_calc_rfq: "Request Quote Based on This Quantity",
+
+        // Services
+        serv_sub: "Value-Added Services",
+        serv_title: "Support Services for B2B Buyers",
+        s1_title: "OEM & Private Label Manufacturing",
+        s1_desc: "Custom packaging design and printing for rice noodles, coconut water cans, and brand embossing on footwear matching buyer specifications.",
+        s2_title: "QC Inspection & Export Packaging",
+        s2_desc: "Dedicated QC engineers supervise production lines, measure moisture content in dry foods, peel strength in footwear, and test export carton durability.",
+        s3_title: "Customs Clearance, C.O & Freight",
+        s3_desc: "Handling all Phytosanitary certificates, FDA registration, preferential export C/O, and container booking for FOB/CIF/DDP deliveries.",
+
+        // RFQ
+        rfq_tag: "Official RFQ Submission",
+        rfq_title: "Submit Sourcing & Export RFQ",
+        rfq_sub: "Fill in the details below to receive detailed product specs and quotations from SilViet Sourcing.",
+        rfq_company: "Buyer Company Name *",
+        rfq_email: "Primary Contact Email *",
+        rfq_phone: "Phone / WhatsApp / WeChat *",
+        rfq_incoterm: "Incoterms Delivery Terms",
+        rfq_prod_select: "Product of Interest *",
+        rfq_qty: "Estimated Order Volume *",
+        rfq_details: "Detailed Requirements (Private Label, Special Certifications...)",
+        btn_submit_rfq: "Submit Official Quote Request",
+
+        // Footer
+        foot_desc: "B2B trade and export connector under SilViet Group. Specializing in dry foods, canned coconut water, and export footwear to the EU, US, and Middle East.",
+        foot_products: "Core Product Lines",
+        foot_links: "Quick Links",
+        foot_contact: "Sourcing Hub Headquarters"
     }
 };
+
+// Hàm cập nhật chữ tĩnh theo ngôn ngữ
+function updateStaticTexts(lang) {
+    const texts = i18nData[lang];
+    if (!texts) return;
+
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (texts[key]) {
+            el.textContent = texts[key];
+        }
+    });
+}
 
 // ================= 2. KHỞI TẠO KHI TẢI TRANG =================
 document.addEventListener('DOMContentLoaded', () => {
@@ -53,20 +197,26 @@ document.addEventListener('DOMContentLoaded', () => {
 // ================= 3. ĐIỀU HƯỚNG & GIAO DIỆN (UI CONTROLS) =================
 
 // Chuyển ngôn ngữ
+// Chuyển ngôn ngữ
 function toggleLanguage() {
     currentLang = currentLang === 'vi' ? 'en' : 'vi';
+
     const langLabel = document.getElementById('langLabel');
-    if (langLabel) langLabel.innerText = currentLang.toUpperCase();
+    if (langLabel) {
+        langLabel.textContent = currentLang === 'vi' ? 'VI / EN' : 'EN / VI';
+    }
 
-    document.querySelectorAll('[data-i18n]').forEach(el => {
-        const key = el.getAttribute('data-i18n');
-        if (i18nData[currentLang][key]) {
-            el.innerText = i18nData[currentLang][key];
-        }
-    });
-    runCbmCalculator();
+    // Gọi hàm cập nhật toàn bộ chữ tĩnh trên HTML
+    updateStaticTexts(currentLang);
+
+    // Load lại dữ liệu động từ Supabase (Sản phẩm & Danh mục)
+    if (typeof loadDynamicCategories === 'function') {
+        loadDynamicCategories();
+    }
+    if (typeof loadProductsIntoCalculator === 'function') {
+        loadProductsIntoCalculator();
+    }
 }
-
 // Menu Mobile
 function toggleMobileMenu() {
     const menu = document.getElementById('mobileMenu');
@@ -153,8 +303,12 @@ async function loadDynamicCategories() {
         // Đồng bộ lưu biến toàn cục cho Popup
         window.allProductsData = products;
 
+        // Kiểm tra ngôn ngữ hiện tại
+        const isEn = typeof currentLang !== 'undefined' && currentLang === 'en';
+
         if (categories.length === 0) {
-            tabsContainer.innerHTML = `<p class="text-slate-500 text-sm">Không có dữ liệu danh mục.</p>`;
+            const noCatMsg = isEn ? 'No category data available.' : 'Không có dữ liệu danh mục.';
+            tabsContainer.innerHTML = `<p class="text-slate-500 text-sm">${noCatMsg}</p>`;
             return;
         }
 
@@ -163,6 +317,9 @@ async function loadDynamicCategories() {
 
         categories.forEach((cat, index) => {
             const isFirst = index === 0;
+
+            // Lấy tên danh mục theo ngôn ngữ (Ưu tiên name_en nếu là tiếng Anh)
+            const categoryDisplayName = isEn ? (cat.name_en || cat.name) : cat.name;
 
             const btn = document.createElement('button');
             btn.type = 'button';
@@ -173,7 +330,7 @@ async function loadDynamicCategories() {
                     ? 'bg-amber-500 text-slate-950 font-bold shadow-lg' 
                     : 'bg-slate-800 text-slate-300 hover:text-white font-medium'
             }`;
-            btn.innerHTML = `<span>${cat.icon || '📦'}</span> ${cat.name}`;
+            btn.innerHTML = `<span>${cat.icon || '📦'}</span> ${categoryDisplayName}`;
             tabsContainer.appendChild(btn);
 
             const gridDiv = document.createElement('div');
@@ -185,9 +342,10 @@ async function loadDynamicCategories() {
             if (catProducts.length > 0) {
                 gridDiv.innerHTML = catProducts.map(prod => renderProductCard(prod)).join('');
             } else {
+                const emptyMsg = isEn ? 'No products found in this category.' : 'Chưa có sản phẩm nào thuộc danh mục này.';
                 gridDiv.innerHTML = `
                     <div class="col-span-full py-12 text-center bg-slate-800/30 rounded-2xl border border-slate-800">
-                        <p class="text-slate-400 text-sm italic">Chưa có sản phẩm nào thuộc danh mục này.</p>
+                        <p class="text-slate-400 text-sm italic">${emptyMsg}</p>
                     </div>
                 `;
             }
@@ -266,13 +424,41 @@ function closeProductDetailModal() {
 
 // ================= CẬP NHẬT RENDER CARD CÓ GẮN CLICK MỞ POPUP =================
 function renderProductCard(prod) {
-    const productName = prod.name_vi || prod.name || prod.name_en || prod.product_name || 'Sản phẩm xuất khẩu';
-    const desc = prod.specs || prod.description || 'Sản phẩm đạt chuẩn xuất khẩu.';
-    const packing = prod.packaging || prod.specs_packing || 'Thùng 5kg / 10kg';
-    const detail = prod.specs_detail || prod.specs || 'Chuẩn xuất khẩu B2B';
-    const cert = prod.specs_cert || prod.certifications || 'FDA, ISO 22000';
+    // 1. Kiểm tra trạng thái ngôn ngữ (mặc định là 'vi' nếu chưa khai báo)
+    const isEn = typeof currentLang !== 'undefined' && currentLang === 'en';
+
+    // 2. Lấy dữ liệu theo đúng ngôn ngữ đang chọn
+    const productName = isEn 
+        ? (prod.name_en || prod.name_vi || prod.name || 'Export Product') 
+        : (prod.name_vi || prod.name || prod.name_en || 'Sản phẩm xuất khẩu');
+
+    const desc = isEn 
+        ? (prod.specs_en || prod.specs || prod.description || 'Export standard product.') 
+        : (prod.specs || prod.description || 'Sản phẩm đạt chuẩn xuất khẩu.');
+
+    const packing = isEn 
+        ? (prod.packaging_en || prod.packaging || prod.specs_packing || '5kg / 10kg Carton') 
+        : (prod.packaging || prod.specs_packing || 'Thùng 5kg / 10kg');
+
+    const detail = isEn 
+        ? (prod.specs_detail_en || prod.specs_detail || prod.specs || 'B2B Export Standard') 
+        : (prod.specs_detail || prod.specs || 'Chuẩn xuất khẩu B2B');
+
+    const cert = isEn 
+        ? (prod.specs_cert_en || prod.specs_cert || prod.certifications || 'FDA, ISO 22000') 
+        : (prod.specs_cert || prod.certifications || 'FDA, ISO 22000');
+
     const img = prod.image_url || 'https://images.unsplash.com/photo-1612927601601-6638404737ce?auto=format&fit=crop&w=600&q=80';
     const safeName = productName.replace(/'/g, "\\'");
+
+    // 3. Các nhãn văn bản đa ngôn ngữ
+    const labels = {
+        clickDetail: isEn ? 'Click to view details' : 'Bấm xem chi tiết',
+        packaging: isEn ? 'Packaging:' : 'Quy cách:',
+        specs: isEn ? 'Specs:' : 'Thông số:',
+        cert: isEn ? 'Certifications:' : 'Chứng nhận:',
+        btnQuote: isEn ? 'Request Specs & Quote →' : 'Yêu Cầu Specs & Báo Giá →'
+    };
 
     return `
         <div class="bg-slate-800/80 border border-slate-700/60 rounded-2xl overflow-hidden hover:border-amber-500/50 transition duration-300 flex flex-col justify-between">
@@ -283,7 +469,7 @@ function renderProductCard(prod) {
                     <span class="absolute top-3 right-3 px-2.5 py-1 rounded-md bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 text-[10px] font-bold uppercase tracking-wider backdrop-blur-md">
                         ${prod.tag || 'SOURCING'}
                     </span>
-                    <span class="absolute bottom-2 left-2 bg-slate-900/80 text-slate-300 text-[10px] px-2 py-0.5 rounded opacity-0 group-hover:opacity-100 transition z-10"> Bấm xem chi tiết</span>
+                    <span class="absolute bottom-2 left-2 bg-slate-900/80 text-slate-300 text-[10px] px-2 py-0.5 rounded opacity-0 group-hover:opacity-100 transition z-10">${labels.clickDetail}</span>
                 </div>
 
                 <!-- Click vào tiêu đề để mở Popup chi tiết -->
@@ -292,23 +478,22 @@ function renderProductCard(prod) {
                     <p class="text-slate-400 text-xs line-clamp-2">${desc}</p>
                     
                     <div class="pt-3 space-y-1.5 text-xs border-t border-slate-700/50 mt-3 text-slate-300">
-                        <div class="flex justify-between"><span>Quy cách:</span> <span class="font-bold text-white">${packing}</span></div>
-                        <div class="flex justify-between"><span>Thông số:</span> <span class="font-bold text-white">${detail}</span></div>
-                        <div class="flex justify-between"><span>Chứng nhận:</span> <span class="font-bold text-emerald-400">${cert}</span></div>
+                        <div class="flex justify-between"><span>${labels.packaging}</span> <span class="font-bold text-white">${packing}</span></div>
+                        <div class="flex justify-between"><span>${labels.specs}</span> <span class="font-bold text-white">${detail}</span></div>
+                        <div class="flex justify-between"><span>${labels.cert}</span> <span class="font-bold text-emerald-400">${cert}</span></div>
                     </div>
                 </div>
             </div>
 
-            <!-- Nút bấm Yêu Cầu Specs & Báo Giá giữ nguyên chức năng trượt xuống form RFQ -->
+            <!-- Nút bấm Yêu Cầu Specs & Báo Giá -->
             <div class="p-5 pt-0">
                 <button type="button" onclick="requestQuoteFor('${safeName}')" class="w-full py-2.5 rounded-xl bg-slate-700 hover:bg-amber-500 hover:text-slate-950 text-white font-semibold text-xs transition duration-200 text-center block cursor-pointer">
-                    Yêu Cầu Specs & Báo Giá →
+                    ${labels.btnQuote}
                 </button>
             </div>
         </div>
     `;
 }
-
 // ================= 5. CBM & CONTAINER CALCULATOR =================
 
 // Tải sản phẩm vào CBM Calculator và Form RFQ
@@ -721,4 +906,17 @@ function toggleAudio() {
         if (audioText) audioText.innerText = 'Bật tiếng';
         if (audioIcon) audioIcon.innerHTML = mutedIconPath;
     }
+}
+// Cập nhật các chữ tĩnh trên giao diện dựa theo từ điển i18nData
+function updateStaticTexts(lang) {
+    const texts = i18nData[lang];
+    if (!texts) return;
+
+    // Quét tất cả các thẻ có gắn thuộc tính data-i18n để đổi text
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (texts[key]) {
+            el.textContent = texts[key];
+        }
+    });
 }
