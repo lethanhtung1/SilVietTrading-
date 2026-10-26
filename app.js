@@ -270,7 +270,7 @@ function renderProductCard(prod) {
     const desc = prod.specs || prod.description || 'Sản phẩm đạt chuẩn xuất khẩu.';
     const packing = prod.packaging || prod.specs_packing || 'Thùng 5kg / 10kg';
     const detail = prod.specs_detail || prod.specs || 'Chuẩn xuất khẩu B2B';
-    const cert = prod.specs_cert || product.certifications || 'FDA, ISO 22000';
+    const cert = prod.specs_cert || prod.certifications || 'FDA, ISO 22000';
     const img = prod.image_url || 'https://images.unsplash.com/photo-1612927601601-6638404737ce?auto=format&fit=crop&w=600&q=80';
     const safeName = productName.replace(/'/g, "\\'");
 
