@@ -279,7 +279,7 @@ function renderProductCard(prod) {
             <div>
                 <!-- Click vào ảnh để mở Popup chi tiết -->
                 <div onclick="openProductDetailModal('${prod.id}')" class="relative h-64 overflow-hidden bg-slate-950 flex items-center justify-center p-2 cursor-pointer group">
-                    <img src="${img}" alt="${productName}" class="w-full h-full object-contain group-hover:scale-105 transition duration-500" onerror="this.src='https://placehold.co/600x400/0f172a/ffffff?text=SilViet+Product'">
+                    <img src="${img}" alt="${productName}" loading="lazy" class="w-full h-full object-contain group-hover:scale-105 transition duration-500" onerror="this.src='https://placehold.co/600x400/0f172a/ffffff?text=SilViet+Product'">
                     <span class="absolute top-3 right-3 px-2.5 py-1 rounded-md bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 text-[10px] font-bold uppercase tracking-wider backdrop-blur-md">
                         ${prod.tag || 'SOURCING'}
                     </span>
