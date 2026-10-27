@@ -3,6 +3,8 @@ let globalProductsForCalc = [];
 let globalCompaniesList = [];
 let currentFilteredCompanies = [];
 let currentLang = 'vi';
+let categoryPages = {}; 
+const ITEMS_PER_PAGE = 6;
 
 const fallbackCompanies = [
     { id: 1, name: "SilViet Sourcing Hub - Bình Dương", location: "Bình Dương, Việt Nam", capacity: "50,000 m²" },
@@ -276,7 +278,6 @@ function requestQuoteFor(productName) {
 
 // ================= 4. SUPABASE DATA & RENDER PRODUCTS =================
 
-// Tải danh mục động & sản phẩm từ Supabase
 async function loadDynamicCategories() {
     const tabsContainer = document.getElementById('categoryTabsContainer');
     const contentsContainer = document.getElementById('categoryContentsContainer');
@@ -288,7 +289,6 @@ async function loadDynamicCategories() {
     }
 
     try {
-        // Lấy categories và products kèm theo product_details
         const [catRes, prodRes] = await Promise.all([
             window.dbClient.from('categories').select('*'),
             window.dbClient.from('products').select('*, product_details(*)').order('created_at', { ascending: true })
@@ -299,11 +299,8 @@ async function loadDynamicCategories() {
 
         const categories = catRes.data || [];
         const products = prodRes.data || [];
-
-        // Đồng bộ lưu biến toàn cục cho Popup
         window.allProductsData = products;
 
-        // Kiểm tra ngôn ngữ hiện tại
         const isEn = typeof currentLang !== 'undefined' && currentLang === 'en';
 
         if (categories.length === 0) {
@@ -317,10 +314,14 @@ async function loadDynamicCategories() {
 
         categories.forEach((cat, index) => {
             const isFirst = index === 0;
-
-            // Lấy tên danh mục theo ngôn ngữ (Ưu tiên name_en nếu là tiếng Anh)
             const categoryDisplayName = isEn ? (cat.name_en || cat.name) : cat.name;
 
+            // Khởi tạo trang 1 cho danh mục nếu chưa có
+            if (!categoryPages[cat.slug]) {
+                categoryPages[cat.slug] = 1;
+            }
+
+            // Tạo Tab Button
             const btn = document.createElement('button');
             btn.type = 'button';
             btn.id = `tabBtn-${cat.slug}`;
@@ -333,14 +334,78 @@ async function loadDynamicCategories() {
             btn.innerHTML = `<span>${cat.icon || '📦'}</span> ${categoryDisplayName}`;
             tabsContainer.appendChild(btn);
 
+            // Lọc sản phẩm theo danh mục
+            const catProducts = products.filter(p => p.category_id === cat.id || p.category_slug === cat.slug);
+            const currentPage = categoryPages[cat.slug];
+            const totalPages = Math.ceil(catProducts.length / ITEMS_PER_PAGE) || 1;
+
+            // Cắt mảng sản phẩm theo trang hiện tại (Pagination)
+            const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+            const paginatedProducts = catProducts.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+
+            // Container chứa grid sản phẩm và nút phân trang
             const gridDiv = document.createElement('div');
             gridDiv.id = `catContent-${cat.slug}`;
-            gridDiv.className = `cat-content grid sm:grid-cols-2 lg:grid-cols-3 gap-6 ${isFirst ? '' : 'hidden'}`;
+            gridDiv.className = `cat-content space-y-6 ${isFirst ? '' : 'hidden'}`;
 
-            const catProducts = products.filter(p => p.category_id === cat.id || p.category_slug === cat.slug);
+            if (paginatedProducts.length > 0) {
+                const productsGrid = document.createElement('div');
+                productsGrid.className = `grid sm:grid-cols-2 lg:grid-cols-3 gap-6`;
+                productsGrid.innerHTML = paginatedProducts.map(prod => renderProductCard(prod)).join('');
+                gridDiv.appendChild(productsGrid);
 
-            if (catProducts.length > 0) {
-                gridDiv.innerHTML = catProducts.map(prod => renderProductCard(prod)).join('');
+                // Tạo thanh điều hướng phân trang (Pagination UI) nếu có trên 1 trang
+                // Tạo thanh điều hướng phân trang (Pagination UI) có nút Prev / Next
+if (totalPages > 1) {
+    const paginationDiv = document.createElement('div');
+    paginationDiv.className = `flex justify-center items-center gap-2 pt-6`;
+    
+    let paginationHTML = '';
+
+    // 1. Nút PREV (Lùi trang)
+    const prevDisabled = currentPage === 1;
+    paginationHTML += `
+        <button type="button" 
+            onclick="changeCategoryPage('${cat.slug}', ${currentPage - 1})" 
+            class="px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-800 text-slate-300 transition ${
+                prevDisabled ? 'opacity-40 cursor-not-allowed pointer-events-none' : 'hover:bg-slate-700 cursor-pointer'
+            }">
+            &laquo; Prev
+        </button>
+    `;
+
+    // 2. Các nút số trang
+    for (let i = 1; i <= totalPages; i++) {
+        const isActive = i === currentPage;
+        paginationHTML += `
+            <button type="button" 
+                onclick="changeCategoryPage('${cat.slug}', ${i})" 
+                class="px-3.5 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer ${
+                    isActive 
+                        ? 'bg-amber-500 text-slate-950 shadow-md' 
+                        : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
+                }">
+                ${i}
+            </button>
+        `;
+    }
+
+    // 3. Nút NEXT (Tiến trang)
+    const nextDisabled = currentPage === totalPages;
+    paginationHTML += `
+        <button type="button" 
+            onclick="changeCategoryPage('${cat.slug}', ${currentPage + 1})" 
+            class="px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-800 text-slate-300 transition ${
+                nextDisabled ? 'opacity-40 cursor-not-allowed pointer-events-none' : 'hover:bg-slate-700 cursor-pointer'
+            }">
+            Next &raquo;
+        </button>
+    `;
+
+    paginationDiv.innerHTML = paginationHTML;
+    gridDiv.appendChild(paginationDiv);
+}
+
             } else {
                 const emptyMsg = isEn ? 'No products found in this category.' : 'Chưa có sản phẩm nào thuộc danh mục này.';
                 gridDiv.innerHTML = `
@@ -359,7 +424,10 @@ async function loadDynamicCategories() {
         console.error("Lỗi tải danh mục từ Supabase:", err);
     }
 }
-
+function changeCategoryPage(catSlug, pageNum) {
+    categoryPages[catSlug] = pageNum;
+    loadDynamicCategories(); // Gọi lại hàm load để vẽ lại danh mục với trang mới
+}
 // ================= HÀM XỬ LÝ POPUP CHI TIẾT =================
 
 function openProductDetailModal(productId) {
@@ -790,6 +858,9 @@ async function handleMainRFQSubmit(event) {
     const shippingMethod = document.getElementById('rfqShippingMethod')?.value || '';
     const details = document.getElementById('rfqDetails')?.value.trim() || '';
 
+    // Kiểm tra ngôn ngữ hiện tại (EN hay VI)
+    const isEn = typeof currentLang !== 'undefined' && currentLang === 'en';
+
     const rfqPayload = {
         full_name: companyName,
         email: email,
@@ -809,7 +880,9 @@ async function handleMainRFQSubmit(event) {
         console.error('Supabase client chưa được khởi tạo!');
         if (alertBox) {
             alertBox.className = "p-4 rounded-xl text-xs font-medium bg-rose-950/80 border border-rose-500/50 text-rose-300 flex items-center gap-3 shadow-lg";
-            alertBox.innerHTML = `<strong class="font-bold">Lỗi Kết Nối!</strong> Không tìm thấy client Supabase.`;
+            alertBox.innerHTML = isEn 
+                ? `<strong class="font-bold">Connection Error!</strong> Supabase client not found.`
+                : `<strong class="font-bold">Lỗi Kết Nối!</strong> Không tìm thấy client Supabase.`;
             alertBox.classList.remove('hidden');
         }
         return;
@@ -824,12 +897,21 @@ async function handleMainRFQSubmit(event) {
 
         if (alertBox) {
             alertBox.className = "p-4 rounded-xl text-xs font-medium bg-emerald-950/80 border border-emerald-500/50 text-emerald-300 flex items-center gap-3 shadow-lg";
-            alertBox.innerHTML = `
-                <div>
-                    <strong class="font-bold block text-emerald-200">Gửi Yêu Cầu Báo Giá (RFQ) Thành Công!</strong>
-                    SilViet Sourcing đã tiếp nhận thông tin và sẽ gửi bảng Specs & báo giá chi tiết qua email cho bạn.
-                </div>
-            `;
+            if (isEn) {
+                alertBox.innerHTML = `
+                    <div>
+                        <strong class="font-bold block text-emerald-200">Official Quote Request (RFQ) Submitted Successfully!</strong>
+                        SilViet Sourcing has received your information and will send detailed specs & quotation via email.
+                    </div>
+                `;
+            } else {
+                alertBox.innerHTML = `
+                    <div>
+                        <strong class="font-bold block text-emerald-200">Gửi Yêu Cầu Báo Giá (RFQ) Thành Công!</strong>
+                        SilViet Sourcing đã tiếp nhận thông tin và sẽ gửi bảng Specs & báo giá chi tiết qua email cho bạn.
+                    </div>
+                `;
+            }
             alertBox.classList.remove('hidden');
         }
 
@@ -841,8 +923,26 @@ async function handleMainRFQSubmit(event) {
         console.error('Lỗi khi gửi RFQ:', err.message);
         if (alertBox) {
             alertBox.className = "p-4 rounded-xl text-xs font-medium bg-rose-950/80 border border-rose-500/50 text-rose-300 flex items-center gap-3 shadow-lg";
-            alertBox.innerHTML = `<div><strong class="font-bold block text-rose-200">Gửi RFQ Thất Bại!</strong> Chi tiết: ${err.message}</div>`;
+            alertBox.innerHTML = isEn
+                ? `<div><strong class="font-bold block text-rose-200">RFQ Submission Failed!</strong> Details: ${err.message}</div>`
+                : `<div><strong class="font-bold block text-rose-200">Gửi RFQ Thất Bại!</strong> Chi tiết: ${err.message}</div>`;
             alertBox.classList.remove('hidden');
+        }
+    }
+}
+// Hàm xử lý tự động điền / gợi ý khi chọn sản phẩm trong Form RFQ
+function handleRFQProductChange(event) {
+    const selectedProductId = event ? event.target.value : '';
+    if (!selectedProductId) return;
+
+    // Tìm thông tin sản phẩm trong dữ liệu đã tải
+    if (window.allProductsData) {
+        const product = window.allProductsData.find(p => p.id === selectedProductId || p.slug === selectedProductId);
+        if (product && product.company_id) {
+            const supplierSelect = document.getElementById('rfqSupplier');
+            if (supplierSelect) {
+                supplierSelect.value = product.company_id;
+            }
         }
     }
 }
@@ -906,17 +1006,4 @@ function toggleAudio() {
         if (audioText) audioText.innerText = 'Bật tiếng';
         if (audioIcon) audioIcon.innerHTML = mutedIconPath;
     }
-}
-// Cập nhật các chữ tĩnh trên giao diện dựa theo từ điển i18nData
-function updateStaticTexts(lang) {
-    const texts = i18nData[lang];
-    if (!texts) return;
-
-    // Quét tất cả các thẻ có gắn thuộc tính data-i18n để đổi text
-    document.querySelectorAll('[data-i18n]').forEach(el => {
-        const key = el.getAttribute('data-i18n');
-        if (texts[key]) {
-            el.textContent = texts[key];
-        }
-    });
 }

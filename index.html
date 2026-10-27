@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="vi" class="scroll-smooth dark">
-<head>
+<head >
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SilViet Global Trade - B2B Sourcing & Export Connector</title>
@@ -9,7 +9,7 @@
     <meta name="google-site-verification" content="Rmol4DHgOm4TY90tdpiz0wHTq0eAQBq7JUbk8YEPblQ" />
     <meta name="description" content="SilViet Trading - Nền tảng B2B Sourcing & Export kết nối nhà máy sản xuất và nhà mua hàng quốc tế tại Việt Nam.">
     <link rel="icon" type="image/x-icon" href="./favicon.ico">
-
+<link rel="apple-touch-icon" href="./favicon.ico">
     <!-- 1. Google Fonts: Inter -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
@@ -174,18 +174,8 @@
                 <a href="mailto:sourcing@silviet.com" class="hover:text-brand-blueLight transition flex items-center gap-1">
                     <i data-lucide="mail" class="w-3 h-3 text-brand-blueLight"></i> Operation.sup@silviet.com
                 </a>
-                <span class="text-slate-400 dark:text-slate-700">|</span>
-                <!-- Language Toggle Button -->
-                <button id="langToggleBtn" onclick="toggleLanguage()" class="flex items-center gap-1.5 bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-xs px-2.5 py-1 rounded-full text-slate-800 dark:text-white transition border border-slate-300 dark:border-slate-700 cursor-pointer">
-                    <i data-lucide="languages" class="w-3.5 h-3.5 text-brand-emeraldLight"></i>
-                    <span id="langLabel" class="font-bold">VI / EN</span>
-                </button>
-                <span class="text-slate-400 dark:text-slate-700">|</span>
-                <!-- Light / Dark Mode Toggle Button -->
-                <button onclick="toggleThemeMode()" class="flex items-center gap-1.5 bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-xs px-2.5 py-1 rounded-full text-slate-800 dark:text-white transition border border-slate-300 dark:border-slate-700 cursor-pointer" title="Chuyển đổi giao diện Sáng / Tối">
-                    <span class="dark:hidden text-amber-500 font-bold flex items-center gap-1">☀️ Sáng</span>
-                    <span class="hidden dark:inline text-sky-400 font-bold flex items-center gap-1">🌙 Tối</span>
-                </button>
+              
+               
             </div>
         </div>
     </div>
@@ -220,6 +210,17 @@
 
             <!-- CTA Button -->
             <div class="hidden sm:flex items-center space-x-3">
+                 <!-- Language Toggle Button -->
+                <button id="langToggleBtn" onclick="toggleLanguage()" class="flex items-center gap-1.5 bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-xs px-2.5 py-1 rounded-full text-slate-800 dark:text-white transition border border-slate-300 dark:border-slate-700 cursor-pointer">
+                    <i data-lucide="languages" class="w-3.5 h-3.5 text-brand-emeraldLight"></i>
+                    <span id="langLabel" class="font-bold">VI / EN</span>
+                </button>
+                <span class="text-slate-400 dark:text-slate-700">|</span>
+                <!-- Light / Dark Mode Toggle Button -->
+                <button onclick="toggleThemeMode()" class="flex items-center gap-1.5 bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-xs px-2.5 py-1 rounded-full text-slate-800 dark:text-white transition border border-slate-300 dark:border-slate-700 cursor-pointer" title="Chuyển đổi giao diện Sáng / Tối">
+                    <span class="dark:hidden text-amber-500 font-bold flex items-center gap-1">☀️ Sáng</span>
+                    <span class="hidden dark:inline text-sky-400 font-bold flex items-center gap-1">🌙 Tối</span>
+                </button>
                 <button onclick="scrollToRFQ()" class="bg-gradient-to-r from-brand-blue to-brand-emerald hover:brightness-110 text-white px-5 py-2.5 rounded-xl font-bold text-sm shadow-lg shadow-brand-blue/20 transition flex items-center gap-2 cursor-pointer">
                     <i data-lucide="file-text" class="w-4 h-4"></i>
                     <span data-i18n="btn_rfq">Gửi Yêu Cầu Báo Giá (RFQ)</span>
@@ -238,6 +239,22 @@
             <a href="#calculator" onclick="toggleMobileMenu()" class="block py-2 text-slate-700 dark:text-slate-300 font-medium hover:text-brand-emerald" data-i18n="nav_calc">Tính CBM & Container</a>
             <a href="#services" onclick="toggleMobileMenu()" class="block py-2 text-slate-700 dark:text-slate-300 font-medium hover:text-brand-blue" data-i18n="nav_services">Dịch Vụ OEM/ODM</a>
             <a href="#rfq-form" onclick="toggleMobileMenu()" class="block py-2 text-slate-700 dark:text-slate-300 font-medium hover:text-brand-emerald" data-i18n="nav_rfq">Liên Hệ RFQ</a>
+            <div class="flex items-center gap-2 pt-2 border-t border-slate-200 dark:border-slate-800">
+               <button id="langToggleBtn" onclick="toggleLanguage()" class="flex items-center gap-1.5 bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-xs px-2.5 py-1 rounded-full text-slate-800 dark:text-white transition border border-slate-300 dark:border-slate-700 cursor-pointer">
+                    <i data-lucide="languages" class="w-3.5 h-3.5 text-brand-emeraldLight"></i>
+                    <span id="langLabel" class="font-bold">VI / EN</span>
+                </button>
+                <span class="text-slate-400 dark:text-slate-700">|</span>
+                <!-- Light / Dark Mode Toggle Button -->
+                <button onclick="toggleThemeMode()" class="flex items-center gap-1.5 bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-xs px-2.5 py-1 rounded-full text-slate-800 dark:text-white transition border border-slate-300 dark:border-slate-700 cursor-pointer" title="Chuyển đổi giao diện Sáng / Tối">
+                    <span class="dark:hidden text-amber-500 font-bold flex items-center gap-1">☀️ Sáng</span>
+                    <span class="hidden dark:inline text-sky-400 font-bold flex items-center gap-1">🌙 Tối</span>
+                </button>
+                <button onclick="scrollToRFQ()" class="bg-gradient-to-r from-brand-blue to-brand-emerald hover:brightness-110 text-white px-5 py-2.5 rounded-xl font-bold text-sm shadow-lg shadow-brand-blue/20 transition flex items-center gap-2 cursor-pointer">
+                    <i data-lucide="file-text" class="w-4 h-4"></i>
+                    <span data-i18n="btn_rfq">Gửi Yêu Cầu Báo Giá (RFQ)</span>
+                </button>
+            </div>
             <button onclick="scrollToRFQ(); toggleMobileMenu();" class="w-full mt-2 bg-brand-emerald text-white py-2.5 rounded-xl font-bold text-sm shadow flex items-center justify-center gap-2">
                 <i data-lucide="file-text" class="w-4 h-4"></i>
                 <span data-i18n="btn_rfq">Gửi Yêu Cầu Báo Giá (RFQ)</span>
@@ -402,12 +419,7 @@
         <div id="categoryContentsContainer" class="min-h-[250px]"></div>
 
         <div class="mt-12 text-center">
-            <button type="button" onclick="loadMoreProducts()" class="inline-flex items-center gap-2 px-8 py-3.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-white font-semibold text-sm transition-all duration-300 shadow-lg hover:shadow-amber-500/10 hover:border-amber-500/50 group cursor-pointer">
-                <span>Xem thêm tất cả sản phẩm B2B</span>
-                <svg class="w-4 h-4 text-amber-500 group-hover:translate-y-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                </svg>
-            </button>
+           
         </div>
     </div>
 </section>
