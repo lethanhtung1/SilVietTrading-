@@ -21,6 +21,12 @@ const i18nData = {
         nav_rfq: "Liên Hệ RFQ",
         btn_rfq: "Gửi Yêu Cầu Báo Giá (RFQ)",
         
+        // Video Fullscreen Section
+        video_badge: "SilViet Global Experience",
+        video_title: "Hạ Tầng Sourcing & Xuất Khẩu Chuẩn Quốc Tế",
+        video_sub: "Kết nối trực tiếp mạng lưới nhà máy sản xuất quy mô lớn tại Việt Nam với các đối tác toàn cầu.",
+
+        // Hero Section
         hero_badge: "B2B Sourcing & Export Connector - Vietnam to Worldwide",
         hero_title_1: "Cầu Nối Xuất Khẩu B2B",
         hero_title_2: "Nông Sản Khô, Đồ Uống & Giày Dép Việt",
@@ -29,6 +35,7 @@ const i18nData = {
         stat_containers: "Container / Năm",
         stat_qc: "Kiểm Định QC Chuẩn",
         
+        // Quick Finder
         finder_title: "Quick Sourcing Finder",
         finder_sub: "Tra cứu thông số, Nhà máy & nhận báo giá trực tiếp",
         finder_label_1: "Nhóm Hàng Cần Sourcing / OEM",
@@ -44,6 +51,7 @@ const i18nData = {
         cat_title: "Danh Mục Sản Phẩm Kết Nối B2B",
         cat_desc: "Tất cả sản phẩm đều được chuẩn hóa bao bì, nhãn mác đa ngôn ngữ và hồ sơ chứng nhận đầy đủ.",
         
+        // Calculator
         calc_tag: "Công Cụ Ước Tính B2B",
         calc_title: "Tính Thể Tích (CBM) & Tải Trọng Container",
         calc_sub: "Hỗ trợ đối tác tính toán số lượng Container 20ft / 40HC cần thiết cho đơn hàng.",
@@ -55,6 +63,7 @@ const i18nData = {
         res_gw: "Tổng Khối Lượng (GW Kg):",
         btn_calc_rfq: "Gửi Yêu Cầu Báo Giá Theo Số Lượng Này",
 
+        // Services
         serv_sub: "Dịch Vụ Gia Giá Trị Gia Tăng",
         serv_title: "Dịch Vụ Hỗ Trợ Dành Cho B2B Buyers",
         s1_title: "Gia Công OEM & Private Labeling",
@@ -64,6 +73,7 @@ const i18nData = {
         s3_title: "Thủ Tục Hải Quan, C.O & Freight",
         s3_desc: "Xử lý toàn bộ chứng từ kiểm dịch thực vật (Phytosanitary), chứng nhận FDA, C/O ưu đãi thuế xuất khẩu và booking container giao hàng FOB/CIF/DDP.",
 
+        // RFQ Form
         rfq_tag: "Official RFQ Submission",
         rfq_title: "Gửi Yêu Cầu Báo Giá Sourcing & Export",
         rfq_sub: "Điền thông tin bên dưới để nhận bảng thông số Specs & Báo giá chi tiết từ SilViet Sourcing.",
@@ -76,6 +86,13 @@ const i18nData = {
         rfq_details: "Yêu Cầu Chi Tiết (Yêu cầu Private Label, Chứng nhận đặc thù...)",
         btn_submit_rfq: "Gửi Yêu Cầu Báo Giá Chính Thức",
 
+        // RFQ Alert Messages
+        rfq_success_title: "Gửi Yêu Cầu Báo Giá (RFQ) Thành Công!",
+        rfq_success_desc: "SilViet Sourcing đã tiếp nhận thông tin và sẽ gửi bảng Specs & báo giá chi tiết qua email cho bạn.",
+        rfq_err_conn: "Lỗi Kết Nối! Không tìm thấy client Supabase.",
+        rfq_err_fail: "Gửi RFQ Thất Bại!",
+
+        // Footer
         foot_desc: "Đơn vị kết nối thương mại & xuất khẩu B2B thuộc SilViet Group. Chuyên dòng thực phẩm khô, nước dừa đóng lon & giày dép xuất khẩu sang EU, US, Middle East.",
         foot_products: "Dòng Sản Phẩm Chủ Lực",
         foot_links: "Điều Hướng",
@@ -88,7 +105,13 @@ const i18nData = {
         nav_services: "OEM/ODM Services",
         nav_rfq: "Inquire RFQ",
         btn_rfq: "Request a Quote (RFQ)",
+
+        // Video Fullscreen Section
+        video_badge: "SilViet Global Experience",
+        video_title: "International Standard Sourcing & Export Infrastructure",
+        video_sub: "Directly connecting large-scale manufacturing networks in Vietnam with global partners.",
         
+        // Hero Section
         hero_badge: "B2B Sourcing & Export Connector - Vietnam to Worldwide",
         hero_title_1: "B2B Export Connector",
         hero_title_2: "Dry Foods, Beverages & Footwear from Vietnam",
@@ -97,6 +120,7 @@ const i18nData = {
         stat_containers: "Containers / Year",
         stat_qc: "Standard QC Audit",
         
+        // Quick Finder
         finder_title: "Quick Sourcing Finder",
         finder_sub: "Look up specs, factories & get instant quotes",
         finder_label_1: "Sourcing / OEM Product Category",
@@ -112,6 +136,7 @@ const i18nData = {
         cat_title: "B2B Connected Product Catalog",
         cat_desc: "All products feature standardized multi-language packaging, labeling, and complete certification records.",
         
+        // Calculator
         calc_tag: "B2B Estimation Tool",
         calc_title: "CBM Volume & Container Load Calculator",
         calc_sub: "Help partners estimate the required 20ft / 40HC containers for orders.",
@@ -123,6 +148,7 @@ const i18nData = {
         res_gw: "Total Gross Weight (GW Kg):",
         btn_calc_rfq: "Request Quote Based on This Quantity",
 
+        // Services
         serv_sub: "Value-Added Services",
         serv_title: "Support Services for B2B Buyers",
         s1_title: "OEM & Private Label Manufacturing",
@@ -132,6 +158,7 @@ const i18nData = {
         s3_title: "Customs Clearance, C.O & Freight",
         s3_desc: "Handling all Phytosanitary certificates, FDA registration, preferential export C/O, and container booking for FOB/CIF/DDP deliveries.",
 
+        // RFQ Form
         rfq_tag: "Official RFQ Submission",
         rfq_title: "Submit Sourcing & Export RFQ",
         rfq_sub: "Fill in the details below to receive detailed product specs and quotations from SilViet Sourcing.",
@@ -144,13 +171,19 @@ const i18nData = {
         rfq_details: "Detailed Requirements (Private Label, Special Certifications...)",
         btn_submit_rfq: "Submit Official Quote Request",
 
+        // RFQ Alert Messages
+        rfq_success_title: "Official Quote Request (RFQ) Submitted Successfully!",
+        rfq_success_desc: "SilViet Sourcing has received your information and will send detailed specs & quotation via email.",
+        rfq_err_conn: "Connection Error! Supabase client not found.",
+        rfq_err_fail: "RFQ Submission Failed!",
+
+        // Footer
         foot_desc: "B2B trade and export connector under SilViet Group. Specializing in dry foods, canned coconut water, and export footwear to the EU, US, and Middle East.",
         foot_products: "Core Product Lines",
         foot_links: "Quick Links",
         foot_contact: "Sourcing Hub Headquarters"
     }
 };
-
 function updateStaticTexts(lang) {
     const texts = i18nData[lang];
     if (!texts) return;
@@ -210,8 +243,8 @@ function toggleMobileMenu() {
 function switchCategoryTab(targetSlug) {
     document.querySelectorAll('.cat-content').forEach(c => c.classList.add('hidden'));
     document.querySelectorAll('.cat-tab-btn').forEach(b => {
-        b.classList.remove('bg-amber-500', 'text-slate-950', 'font-bold', 'shadow-lg');
-        b.classList.add('bg-slate-800', 'text-slate-300', 'font-medium');
+        b.classList.remove('bg-brand-blue', 'text-white', 'font-semibold');
+        b.classList.add('bg-white', 'text-slate-600', 'border', 'border-slate-200', 'dark:bg-slate-800', 'dark:text-slate-300', 'dark:border-slate-700', 'font-medium');
     });
 
     const activeContent = document.getElementById(`catContent-${targetSlug}`);
@@ -219,8 +252,8 @@ function switchCategoryTab(targetSlug) {
 
     const activeBtn = document.getElementById(`tabBtn-${targetSlug}`);
     if (activeBtn) {
-        activeBtn.classList.remove('bg-slate-800', 'text-slate-300', 'font-medium');
-        activeBtn.classList.add('bg-amber-500', 'text-slate-950', 'font-bold', 'shadow-lg');
+        activeBtn.classList.remove('bg-white', 'text-slate-600', 'border', 'border-slate-200', 'dark:bg-slate-800', 'dark:text-slate-300', 'dark:border-slate-700', 'font-medium');
+        activeBtn.classList.add('bg-brand-blue', 'text-white', 'font-semibold');
     }
 }
 
@@ -300,8 +333,8 @@ async function loadDynamicCategories() {
             btn.onclick = () => switchCategoryTab(cat.slug);
             btn.className = `cat-tab-btn px-5 py-2.5 rounded-xl text-xs sm:text-sm transition-all flex items-center gap-2 cursor-pointer ${
                 isFirst 
-                    ? 'bg-amber-500 text-slate-950 font-bold shadow-lg' 
-                    : 'bg-slate-800 text-slate-300 hover:text-white font-medium'
+                    ? 'bg-brand-blue text-white font-semibold' 
+                    : 'bg-white text-slate-600 border border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700 hover:border-brand-blue hover:text-brand-blue font-medium'
             }`;
             btn.innerHTML = `<span>${cat.icon || '📦'}</span> ${categoryDisplayName}`;
             tabsContainer.appendChild(btn);
@@ -330,7 +363,7 @@ async function loadDynamicCategories() {
                     let paginationHTML = '';
                     const prevDisabled = currentPage === 1;
                     paginationHTML += `
-                        <button type="button" onclick="changeCategoryPage('${cat.slug}', ${currentPage - 1})" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-800 text-slate-300 transition ${prevDisabled ? 'opacity-40 cursor-not-allowed pointer-events-none' : 'hover:bg-slate-700 cursor-pointer'}">
+                        <button type="button" onclick="changeCategoryPage('${cat.slug}', ${currentPage - 1})" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-white text-slate-600 border border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700 transition ${prevDisabled ? 'opacity-40 cursor-not-allowed pointer-events-none' : 'hover:border-brand-blue cursor-pointer'}">
                             &laquo; Prev
                         </button>
                     `;
@@ -338,7 +371,7 @@ async function loadDynamicCategories() {
                     for (let i = 1; i <= totalPages; i++) {
                         const isActive = i === currentPage;
                         paginationHTML += `
-                            <button type="button" onclick="changeCategoryPage('${cat.slug}', ${i})" class="px-3.5 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer ${isActive ? 'bg-amber-500 text-slate-950 shadow-md' : 'bg-slate-800 text-slate-300 hover:bg-slate-700'}">
+                            <button type="button" onclick="changeCategoryPage('${cat.slug}', ${i})" class="px-3.5 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer ${isActive ? 'bg-brand-blue text-white' : 'bg-white text-slate-600 border border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700 hover:bg-slate-700'}">
                                 ${i}
                             </button>
                         `;
@@ -346,7 +379,7 @@ async function loadDynamicCategories() {
 
                     const nextDisabled = currentPage === totalPages;
                     paginationHTML += `
-                        <button type="button" onclick="changeCategoryPage('${cat.slug}', ${currentPage + 1})" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-800 text-slate-300 transition ${nextDisabled ? 'opacity-40 cursor-not-allowed pointer-events-none' : 'hover:bg-slate-700 cursor-pointer'}">
+                        <button type="button" onclick="changeCategoryPage('${cat.slug}', ${currentPage + 1})" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-white text-slate-600 border border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700 transition ${nextDisabled ? 'opacity-40 cursor-not-allowed pointer-events-none' : 'hover:border-brand-blue cursor-pointer'}">
                             Next &raquo;
                         </button>
                     `;
@@ -466,30 +499,30 @@ function renderProductCard(prod) {
     };
 
     return `
-        <div class="bg-slate-800/80 border border-slate-700/60 rounded-2xl overflow-hidden hover:border-amber-500/50 transition duration-300 flex flex-col justify-between">
+        <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl overflow-hidden hover:border-brand-blue transition flex flex-col justify-between">
             <div>
-                <div onclick="openProductDetailModal('${prod.id}')" class="relative h-64 overflow-hidden bg-slate-950 flex items-center justify-center p-2 cursor-pointer group">
-                    <img src="${img}" alt="${productName}" loading="lazy" class="w-full h-full object-contain group-hover:scale-105 transition duration-500" onerror="this.src='https://placehold.co/600x400/0f172a/ffffff?text=SilViet+Product'">
-                    <span class="absolute top-3 right-3 px-2.5 py-1 rounded-md bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 text-[10px] font-bold uppercase tracking-wider backdrop-blur-md">
+                <div onclick="openProductDetailModal('${prod.id}')" class="relative h-56 overflow-hidden bg-slate-100 dark:bg-slate-900 flex items-center justify-center cursor-pointer group">
+                    <img src="${img}" alt="${productName}" loading="lazy" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/600x400/0f172a/ffffff?text=SilViet+Product'">
+                    <span class="absolute top-3 right-3 px-2.5 py-1 rounded-md bg-white/90 text-brand-blue text-xs font-medium shadow-sm">
                         ${prod.tag || 'SOURCING'}
                     </span>
                     <span class="absolute bottom-2 left-2 bg-slate-900/80 text-slate-300 text-[10px] px-2 py-0.5 rounded opacity-0 group-hover:opacity-100 transition z-10">${labels.clickDetail}</span>
                 </div>
 
                 <div class="p-5 space-y-2">
-                    <h3 onclick="openProductDetailModal('${prod.id}')" class="text-white font-bold text-base leading-snug cursor-pointer hover:text-amber-400 transition">${productName}</h3>
-                    <p class="text-slate-400 text-xs line-clamp-2">${desc}</p>
+                    <h3 onclick="openProductDetailModal('${prod.id}')" class="text-slate-900 dark:text-white font-semibold text-base leading-snug cursor-pointer hover:text-brand-blue transition">${productName}</h3>
+                    <p class="text-slate-500 dark:text-slate-400 text-sm line-clamp-2">${desc}</p>
                     
-                    <div class="pt-3 space-y-1.5 text-xs border-t border-slate-700/50 mt-3 text-slate-300">
-                        <div class="flex justify-between"><span>${labels.packaging}</span> <span class="font-bold text-white">${packing}</span></div>
-                        <div class="flex justify-between"><span>${labels.specs}</span> <span class="font-bold text-white">${detail}</span></div>
-                        <div class="flex justify-between"><span>${labels.cert}</span> <span class="font-bold text-emerald-400">${cert}</span></div>
+                    <div class="pt-3 space-y-2 text-sm border-t border-slate-200 dark:border-slate-700 mt-3 text-slate-500 dark:text-slate-300">
+                        <div class="flex justify-between"><span>${labels.packaging}</span> <span class="font-medium text-slate-900 dark:text-white">${packing}</span></div>
+                        <div class="flex justify-between"><span>${labels.specs}</span> <span class="font-medium text-slate-900 dark:text-white">${detail}</span></div>
+                        <div class="flex justify-between"><span>${labels.cert}</span> <span class="font-medium text-brand-blue dark:text-brand-blueLight">${cert}</span></div>
                     </div>
                 </div>
             </div>
 
             <div class="p-5 pt-0">
-                <button type="button" onclick="requestQuoteFor('${safeName}')" class="w-full py-2.5 rounded-xl bg-slate-700 hover:bg-amber-500 hover:text-slate-950 text-white font-semibold text-xs transition duration-200 text-center block cursor-pointer">
+                <button type="button" onclick="requestQuoteFor('${safeName}')" class="w-full py-2.5 rounded-xl border border-brand-blue text-brand-blue hover:bg-brand-blue hover:text-white font-semibold text-sm transition text-center block cursor-pointer">
                     ${labels.btnQuote}
                 </button>
             </div>

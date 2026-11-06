@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="vi" class="scroll-smooth dark">
+<html lang="vi" class="scroll-smooth">
 <head >
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,7 +11,7 @@
     <link rel="icon" type="image/x-icon" href="./favicon.ico">
 <link rel="apple-touch-icon" href="./favicon.ico">
     <!-- 1. Google Fonts: Inter -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
     <!-- 2. Tailwind CSS CDN & Config -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -24,16 +24,16 @@
                         brand: {
                             navy: '#0f172a',
                             navyLight: '#1e293b',
-                            blue: '#0284c7',
-                            blueDark: '#0369a1',
-                            blueLight: '#38bdf8',
-                            emerald: '#10b981',
-                            emeraldDark: '#059669',
-                            emeraldLight: '#34d399'
+                            blue: '#0b5fa5',
+                            blueDark: '#084a85',
+                            blueLight: '#5aa9e6',
+                            emerald: '#0b5fa5',
+                            emeraldDark: '#084a85',
+                            emeraldLight: '#5aa9e6'
                         }
                     },
                     fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
+                        sans: ['Be Vietnam Pro', 'sans-serif'],
                     }
                 }
             }
@@ -45,7 +45,7 @@
 
     <!-- Custom Inline Styles -->
     <style>
-        body { font-family: 'Inter', sans-serif; }
+        body { font-family: 'Be Vietnam Pro', sans-serif; }
         .glass-panel {
             background: rgba(15, 23, 42, 0.85);
             backdrop-filter: blur(16px);
@@ -64,11 +64,7 @@
 
     <!-- Theme Initializer Script -->
     <script>
-        if (localStorage.getItem('theme') === 'light') {
-            document.documentElement.classList.remove('dark');
-        } else {
-            document.documentElement.classList.add('dark');
-        }
+        if (localStorage.getItem('theme') === 'dark') { document.documentElement.classList.add('dark'); } else { document.documentElement.classList.remove('dark'); }
     </script>
 
     <!-- 4. Core JavaScript Libraries -->
@@ -83,6 +79,33 @@
 
     <!-- 6. Main App Script -->
     <script src="app.js" defer></script>
+<style id="silviet-theme">
+:root{--sv-brand:#0b5fa5;--sv-brand-dark:#084a85}
+h1,h2,h3,h4{letter-spacing:-.01em}
+.font-black,.font-extrabold{font-weight:700!important}
+.uppercase{text-transform:none!important}
+[class*="tracking-wider"],[class*="tracking-widest"],[class*="tracking-[0"]{letter-spacing:0!important}
+.rounded-3xl,.rounded-2xl{border-radius:12px!important}
+.rounded-xl{border-radius:8px!important}
+.shadow-2xl,.shadow-xl,.shadow-lg{box-shadow:0 1px 3px rgba(15,42,67,.08)!important}
+.bg-gradient-to-r.from-brand-blue{background-image:none!important;background-color:var(--sv-brand)!important}
+.bg-gradient-to-r.from-brand-blue:hover{background-color:var(--sv-brand-dark)!important;filter:none!important}
+header.sticky{box-shadow:none!important;background:rgba(255,255,255,.97)!important}
+html.dark header.sticky{background:rgba(15,23,42,.97)!important}
+section[id]{scroll-margin-top:88px}
+section.py-16{padding-block:5rem!important}
+footer h5{border-left:0!important;padding-left:0!important;font-size:.875rem!important;color:#fff}
+footer .text-amber-400,footer .text-emerald-400,footer .text-blue-400,footer .text-rose-400{color:#8ec1ee!important}
+:focus-visible{outline:2px solid var(--sv-brand);outline-offset:2px}
+h1,h2,h3{line-height:1.3!important}
+section h1{font-size:clamp(1.875rem,3.4vw,2.75rem)!important}
+h2.drop-shadow-md{font-size:clamp(1.75rem,3.2vw,2.75rem)!important}
+[class~="lg:py-24"]{padding-block:4rem!important}
+header a,header button,header nav a{white-space:nowrap}
+header nav{gap:1.75rem}header nav>*+*{margin-left:0!important}
+@media(max-width:1279px){header nav{gap:1rem;font-size:.8125rem}header a[href="#"] span span:last-child{display:none}}
+#categoryTabsContainer{border-bottom-color:transparent}
+</style>
 </head>
 <body class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 antialiased selection:bg-brand-emerald selection:text-white flex flex-col min-h-screen transition-colors duration-300">
 
@@ -111,7 +134,7 @@
 </style>
 
 <!-- ================= SECTION VIDEO FULL MÀN HÌNH ================= -->
-<section class="relative w-full h-screen bg-slate-950 overflow-hidden flex items-center justify-center border-b border-slate-800">
+<section class="relative w-full h-[72vh] min-h-[440px] bg-slate-950 overflow-hidden flex items-center justify-center border-b border-slate-800">
   <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-black/50 z-10 pointer-events-none"></div>
 
   <video 
@@ -133,22 +156,22 @@
       <span id="audioText">Bật tiếng</span>
   </button>
 
-    <div class="relative z-20 container mx-auto px-6 lg:px-12 h-full flex flex-col justify-end pb-20" data-aos="fade-up" data-aos-duration="1000">
-        <div class="max-w-3xl space-y-3">
-            <span class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-500/20 border border-amber-500/40 text-amber-300 text-xs font-bold uppercase tracking-widest backdrop-blur-md shadow-lg">
-                <span class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
-                SilViet Global Experience
-            </span>
+    <div class="relative z-20 container mx-auto px-6 lg:px-12 h-full flex flex-col justify-end pb-20">
+    <div class="max-w-3xl space-y-3">
+        <span class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/15 border border-white/30 text-white text-xs font-medium backdrop-blur-sm">
+            <span class="w-2 h-2 rounded-full bg-white"></span>
+            <span data-i18n="video_badge">SilViet Global Experience</span>
+        </span>
 
-            <h2 class="text-3xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight drop-shadow-md leading-tight">
-                Hạ Tầng Sourcing & Xuất Khẩu Chuẩn Quốc Tế
-            </h2>
+        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight drop-shadow-md leading-tight" data-i18n="video_title">
+            Hạ Tầng Sourcing &amp; Xuất Khẩu Chuẩn Quốc Tế
+        </h2>
 
-            <p class="text-slate-300 text-sm sm:text-base max-w-xl font-normal drop-shadow">
-                Kết nối trực tiếp mạng lưới nhà máy sản xuất quy mô lớn tại Việt Nam với các đối tác toàn cầu.
-            </p>
-        </div>
+        <p class="text-slate-300 text-sm sm:text-base max-w-xl font-normal drop-shadow" data-i18n="video_sub">
+            Kết nối trực tiếp mạng lưới nhà máy sản xuất quy mô lớn tại Việt Nam với các đối tác toàn cầu.
+        </p>
     </div>
+</div>
 </section>
 
     <!-- TOP ANNOUNCEMENT BAR -->
@@ -173,22 +196,7 @@
     <!-- HEADER / NAVIGATION -->
     <header class="sticky top-0 z-50 bg-white/85 dark:bg-slate-900/85 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 shadow-xl transition-all duration-300">
         <div class="container mx-auto px-4 lg:px-8 h-20 flex items-center justify-between">
-            <a href="#" class="flex items-center gap-3.5 group">
-                <div class="p-1 rounded-2xl bg-gradient-to-br from-amber-500/20 via-red-500/10 to-transparent border border-amber-500/30 group-hover:border-amber-400/60 transition-all shadow-md">
-                    <img src="./silviet-logo.webp" alt="SilViet Logo" class="w-10 h-10 rounded-xl object-contain bg-slate-950/80 p-0.5 shrink-0">
-                </div>
-                <div class="flex flex-col justify-center">
-                    <div class="flex items-center gap-1 leading-none">
-                        <span class="text-2xl font-black tracking-tight text-slate-900 dark:text-white">Sil</span>
-                        <span class="text-2xl font-black tracking-tight bg-gradient-to-r from-amber-500 via-yellow-500 to-amber-600 dark:from-amber-300 dark:via-yellow-400 dark:to-amber-500 bg-clip-text text-transparent">
-                            Viet
-                        </span>
-                    </div>
-                    <span class="text-[9px] font-bold tracking-[0.2em] text-amber-600 dark:text-amber-200/70 uppercase leading-none mt-1.5 block">
-                        Global B2B Trade & Sourcing
-                    </span>
-                </div>
-            </a>
+            <a href="#" class="flex items-center gap-3"><img src="./silviet-logo.webp" alt="SilViet Logo" class="w-10 h-10 object-contain"><span class="flex flex-col leading-tight"><span class="text-xl font-bold text-slate-900 dark:text-white">SilViet</span><span class="text-xs text-slate-500 dark:text-slate-400">Global B2B Trade &amp; Sourcing</span></span></a>
 
             <!-- Desktop Navigation -->
             <nav class="hidden lg:flex items-center space-x-8 text-sm font-medium text-slate-600 dark:text-slate-300">
@@ -254,13 +262,10 @@
 
 <!-- HERO SECTION WITH QUICK FINDER -->
 <section class="relative bg-gradient-to-b from-slate-100 via-white to-slate-100 dark:from-slate-900 dark:via-slate-900 dark:to-slate-950 text-slate-900 dark:text-white py-16 lg:py-24 overflow-hidden border-b border-slate-200 dark:border-slate-800">
-    <div class="absolute -top-32 -left-32 w-96 h-96 bg-brand-blue/10 dark:bg-brand-blue/20 rounded-full blur-3xl pointer-events-none"></div>
-    <div class="absolute top-1/2 -right-32 w-96 h-96 bg-brand-emerald/10 dark:bg-brand-emerald/15 rounded-full blur-3xl pointer-events-none"></div>
-
     <div class="container mx-auto px-4 lg:px-8 relative z-10">
         <div class="grid lg:grid-cols-12 gap-12 items-center">
             
-            <div class="lg:col-span-7 space-y-6 text-center lg:text-left" data-aos="fade-right" data-aos-duration="900">
+            <div class="lg:col-span-7 space-y-6 text-center lg:text-left">
                 <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-200/80 dark:bg-slate-800/90 border border-slate-300 dark:border-slate-700 text-xs font-semibold text-brand-blue dark:text-brand-emeraldLight shadow-inner">
                     <i data-lucide="globe-2" class="w-3.5 h-3.5"></i>
                     <span data-i18n="hero_badge">B2B Sourcing & Export Connector - Vietnam to Worldwide</span>
@@ -268,7 +273,7 @@
 
                 <h1 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight leading-tight">
                     <span data-i18n="hero_title_1">Cầu Nối Xuất Khẩu B2B</span> <br>
-                    <span class="bg-gradient-to-r from-brand-blueDark via-teal-600 to-brand-emerald dark:from-brand-blueLight dark:via-teal-200 dark:to-brand-emeraldLight bg-clip-text text-transparent" data-i18n="hero_title_2">Nông Sản Khô, Đồ Uống & Giày Dép Việt</span>
+                    <span class="text-brand-blue dark:text-brand-blueLight" data-i18n="hero_title_2">Nông Sản Khô, Đồ Uống & Giày Dép Việt</span>
                 </h1>
 
                 <p class="text-slate-600 dark:text-slate-300 text-base sm:text-lg max-w-2xl mx-auto lg:mx-0 font-normal leading-relaxed" data-i18n="hero_sub">
@@ -276,28 +281,24 @@
                 </p>
 
                 <div class="pt-4 grid grid-cols-3 gap-4 border-t border-slate-200 dark:border-slate-800/80 max-w-xl mx-auto lg:mx-0">
-                    <div data-aos="zoom-in" data-aos-delay="150">
+                    <div>
                         <p class="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white">100+</p>
                         <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5" data-i18n="stat_factories">Nhà Máy Đối Tác</p>
                     </div>
-                    <div data-aos="zoom-in" data-aos-delay="250">
+                    <div>
                         <p class="text-2xl sm:text-3xl font-black text-brand-emerald">300+</p>
                         <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5" data-i18n="stat_containers">Container / Năm</p>
                     </div>
-                    <div data-aos="zoom-in" data-aos-delay="350">
+                    <div>
                         <p class="text-2xl sm:text-3xl font-black text-brand-blue">100%</p>
                         <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5" data-i18n="stat_qc">Kiểm Định QC Chuẩn</p>
                     </div>
                 </div>
             </div>
 
-            <div class="lg:col-span-5" data-aos="fade-left" data-aos-duration="900" data-aos-delay="200">
+            <div class="lg:col-span-5">
                 <div class="relative group">
-                    <div class="absolute -inset-1 bg-gradient-to-r from-brand-emerald/30 via-amber-500/15 to-brand-blue/30 rounded-3xl blur-xl opacity-70 group-hover:opacity-100 transition duration-1000"></div>
-
                     <div class="relative bg-white dark:bg-slate-900/95 backdrop-blur-xl rounded-3xl p-6 sm:p-7 shadow-2xl border border-slate-200 dark:border-slate-700/80 overflow-hidden">
-                        <div class="absolute -top-16 -right-16 w-36 h-36 bg-brand-emerald/10 rounded-full blur-2xl pointer-events-none"></div>
-                        
                         <div class="relative z-10">
                             <div class="flex items-center justify-between pb-3.5 mb-4 border-b border-slate-200 dark:border-slate-800">
                                 <div class="flex items-center gap-3">
@@ -386,7 +387,7 @@
 </section>
 
 <!-- ================= CATEGORIES SECTION ================= -->
-<section id="categories" class="py-16 bg-white dark:bg-slate-900 transition-colors duration-300" data-aos="fade-right">
+<section id="categories" class="py-16 bg-white dark:bg-slate-900 transition-colors duration-300">
     <div class="container mx-auto px-4 lg:px-8">
         <div class="flex flex-col md:flex-row md:items-end justify-between mb-8">
             <div>
@@ -612,10 +613,7 @@
 </section>
 
 <!-- ================= FOOTER ================= -->
-<footer class="bg-slate-900 dark:bg-slate-950 text-slate-400 text-xs py-14 border-t border-slate-200 dark:border-slate-800/80 relative overflow-hidden mt-auto transition-colors duration-300" data-aos="fade-up">
-    <div class="absolute bottom-0 left-1/4 w-96 h-96 bg-amber-500/5 rounded-full blur-3xl pointer-events-none"></div>
-    <div class="absolute top-0 right-1/4 w-96 h-96 bg-emerald-500/5 rounded-full blur-3xl pointer-events-none"></div>
-
+<footer class="bg-slate-900 dark:bg-slate-950 text-slate-400 text-xs py-14 border-t border-slate-200 dark:border-slate-800/80 relative overflow-hidden mt-auto transition-colors duration-300">
     <div class="container mx-auto px-4 lg:px-8 relative z-10">
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-10 pb-12 border-b border-slate-800/80">
             
