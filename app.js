@@ -1,22 +1,28 @@
 // ================= 1. BIẾN TOÀN CỤC & DỮ LIỆU DỰ PHÒNG =================
-let globalProductsForCalc = [];
-let globalCompaniesList = [];
-let currentFilteredCompanies = [];
+let globalProducts = [];
 let currentLang = 'vi';
 let categoryPages = {}; 
 const ITEMS_PER_PAGE = 6;
 
-const fallbackCompanies = [
-    { id: 'cb4d481b-f315-4723-8fbe-db7390ac551b', name: "An Giang Agro-Food Export Factory", location: "An Giang, Việt Nam", certs: ["FDA", "ISO 22000"], target_markets: ["Mỹ / Canada (FDA)", "Châu Âu (EU Standard)", "Nhật / Hàn / ASEAN"] },
-    { id: '049d7990-1ddc-44dd-a197-aabf8536ee13', name: "Bến Tre Coconut Processing JSC", location: "Bến Tre, Việt Nam", certs: ["FDA", "Halal"], target_markets: ["Mỹ / Canada (FDA)", "Trung Đông (Halal Cert)", "EU / UK"] },
-    { id: '9e4baf50-2dfe-4e8c-944e-15b56edc62d5', name: "Saigon Footwear Manufacturing Ltd.", location: "TP. Hồ Chí Minh, Việt Nam", certs: ["BSCI Audit"], target_markets: ["Châu Âu (EU Standard)", "Mỹ", "Nhật Bản"] }
+// Giá trị đặc biệt của option "Sản phẩm khác" (khách tự nhập)
+const CUSTOM_PRODUCT_VALUE = '__custom__';
+
+// Option "Thị trường khác" -> cho khách tự nhập
+const OTHER_MARKET_VALUE = 'Thị trường khác';
+
+// Thị trường xuất khẩu đích (value luôn là tiếng Việt để lưu DB nhất quán)
+const TARGET_MARKETS = [
+    { value: "Mỹ / Canada (FDA)",        en: "USA / Canada (FDA)" },
+    { value: "Châu Âu (EU Standard)",    en: "Europe (EU Standard)" },
+    { value: "Trung Đông (Halal Cert)",  en: "Middle East (Halal Cert)" },
+    { value: "Nhật / Hàn / ASEAN",       en: "Japan / Korea / ASEAN" },
+    { value: OTHER_MARKET_VALUE,         en: "Other markets" }
 ];
 
 const i18nData = {
     vi: {
         top_network: "SilViet Sourcing Hub: Ho Chi Minh • Binh Duong",
         nav_products: "Sản Phẩm Chủ Lực",
-        nav_calc: "Tính CBM & Container",
         nav_services: "Dịch Vụ OEM/ODM",
         nav_rfq: "Liên Hệ RFQ",
         btn_rfq: "Gửi Yêu Cầu Báo Giá (RFQ)",
@@ -37,32 +43,23 @@ const i18nData = {
         
         // Quick Finder
         finder_title: "Quick Sourcing Finder",
-        finder_sub: "Tra cứu thông số, Nhà máy & nhận báo giá trực tiếp",
+        finder_sub: "Chọn sản phẩm & nhận báo giá trực tiếp",
         finder_label_1: "Nhóm Hàng Cần Sourcing / OEM",
         finder_select_prod: "Chọn sản phẩm OEM / Sourcing",
-        finder_label_2: "Chọn Nhà Máy Đối Tác (Verified Supplier)",
-        finder_default_prod: "Vui lòng chọn sản phẩm trước",
-        finder_label_certs: "Chứng chỉ & Tiêu chuẩn nhà máy:",
-        finder_default_certs: "Chọn nhà máy để xem chứng chỉ...",
-        finder_label_3: "Thị Trường Xuất Khẩu Đích",
-        finder_default_market: "Chọn nhà máy để xem thị trường phù hợp",
-        finder_btn_submit: "Kết Nối Nhà Máy & Nhận RFQ",
+        finder_label_2: "Thị Trường Xuất Khẩu Đích",
+        finder_btn_submit: "Nhận Báo Giá (RFQ)",
+        finder_custom_ph: "Nhập sản phẩm bạn cần (VD: bánh tráng, giày da, cà phê...)",
+        rfq_custom_ph: "Mô tả sản phẩm bạn cần (tên, quy cách, bao bì...)",
+        market_custom_ph: "Nhập thị trường/quốc gia bạn muốn xuất khẩu tới (VD: Úc, Brazil...)",
+        opt_select_prod: "Chọn sản phẩm OEM / Sourcing",
+        opt_custom_prod: "Sản phẩm khác",
+        opt_select_market: "Chọn thị trường (không bắt buộc)",
+        alert_select_prod: "Vui lòng chọn sản phẩm cần sourcing!",
+        alert_enter_custom: "Vui lòng nhập tên sản phẩm bạn mong muốn!",
         cat_badge: "Chủ Lực Xuất Khẩu",
         cat_title: "Danh Mục Sản Phẩm Kết Nối B2B",
         cat_desc: "Tất cả sản phẩm đều được chuẩn hóa bao bì, nhãn mác đa ngôn ngữ và hồ sơ chứng nhận đầy đủ.",
         
-        // Calculator
-        calc_tag: "Công Cụ Ước Tính B2B",
-        calc_title: "Tính Thể Tích (CBM) & Tải Trọng Container",
-        calc_sub: "Hỗ trợ đối tác tính toán số lượng Container 20ft / 40HC cần thiết cho đơn hàng.",
-        c1_head: "1. Chọn Mặt Hàng & Số Lượng",
-        c1_select_prod: "Dòng Sản Phẩm Sourcing:",
-        c1_carton_qty: "Tổng số Thùng Carton (hoặc Tổng số Đôi giày):",
-        c2_head: "2. Kết Quả Ước Tính Xuất Khẩu",
-        res_cbm: "Tổng Thể Tích (CBM):",
-        res_gw: "Tổng Khối Lượng (GW Kg):",
-        btn_calc_rfq: "Gửi Yêu Cầu Báo Giá Theo Số Lượng Này",
-
         // Services
         serv_sub: "Dịch Vụ Gia Giá Trị Gia Tăng",
         serv_title: "Dịch Vụ Hỗ Trợ Dành Cho B2B Buyers",
@@ -101,7 +98,6 @@ const i18nData = {
     en: {
         top_network: "SilViet Sourcing Hub: Ho Chi Minh • Binh Duong",
         nav_products: "Core Products",
-        nav_calc: "CBM & Container Calc",
         nav_services: "OEM/ODM Services",
         nav_rfq: "Inquire RFQ",
         btn_rfq: "Request a Quote (RFQ)",
@@ -122,32 +118,23 @@ const i18nData = {
         
         // Quick Finder
         finder_title: "Quick Sourcing Finder",
-        finder_sub: "Look up specs, factories & get instant quotes",
+        finder_sub: "Pick a product & get a direct quote",
         finder_label_1: "Sourcing / OEM Product Category",
         finder_select_prod: "Select OEM / Sourcing product",
-        finder_label_2: "Verified Partner Supplier",
-        finder_default_prod: "Please select a product first",
-        finder_label_certs: "Factory Certifications & Standards:",
-        finder_default_certs: "Select a factory to view certifications...",
-        finder_label_3: "Target Export Market",
-        finder_default_market: "Select a factory to view matching markets",
-        finder_btn_submit: "Connect Factory & Get RFQ",
+        finder_label_2: "Target Export Market",
+        finder_btn_submit: "Get Quote (RFQ)",
+        finder_custom_ph: "Enter the product you need (e.g. rice paper, leather shoes, coffee...)",
+        rfq_custom_ph: "Describe the product you need (name, spec, packaging...)",
+        market_custom_ph: "Enter the market/country you want to export to (e.g. Australia, Brazil...)",
+        opt_select_prod: "Select OEM / Sourcing product",
+        opt_custom_prod: "✍️ Other product - I'll enter my own request",
+        opt_select_market: "Select market (optional)",
+        alert_select_prod: "Please select a product to source!",
+        alert_enter_custom: "Please enter the product you are looking for!",
         cat_badge: "Core Export Highlights",
         cat_title: "B2B Connected Product Catalog",
         cat_desc: "All products feature standardized multi-language packaging, labeling, and complete certification records.",
         
-        // Calculator
-        calc_tag: "B2B Estimation Tool",
-        calc_title: "CBM Volume & Container Load Calculator",
-        calc_sub: "Help partners estimate the required 20ft / 40HC containers for orders.",
-        c1_head: "1. Select Product & Quantity",
-        c1_select_prod: "Sourcing Product Line:",
-        c1_carton_qty: "Total Carton Boxes (or Total Shoe Pairs):",
-        c2_head: "2. Export Estimation Results",
-        res_cbm: "Total Volume (CBM):",
-        res_gw: "Total Gross Weight (GW Kg):",
-        btn_calc_rfq: "Request Quote Based on This Quantity",
-
         // Services
         serv_sub: "Value-Added Services",
         serv_title: "Support Services for B2B Buyers",
@@ -194,6 +181,11 @@ function updateStaticTexts(lang) {
             el.textContent = texts[key];
         }
     });
+
+    document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+        const key = el.getAttribute('data-i18n-placeholder');
+        if (texts[key]) el.placeholder = texts[key];
+    });
 }
 
 // ================= 2. KHỞI TẠO KHI TẢI TRANG =================
@@ -201,8 +193,8 @@ document.addEventListener('DOMContentLoaded', () => {
     if (typeof lucide !== 'undefined') lucide.createIcons();
 
     loadDynamicCategories();
-    loadProductsIntoCalculator();
-    loadAllSystemData();
+    renderMarketOptions();
+    loadProducts();
 
     if (typeof AOS !== 'undefined') {
         AOS.init({
@@ -230,9 +222,8 @@ function toggleLanguage() {
     if (typeof loadDynamicCategories === 'function') {
         loadDynamicCategories();
     }
-    if (typeof loadProductsIntoCalculator === 'function') {
-        loadProductsIntoCalculator();
-    }
+    renderProductSelects();
+    renderMarketOptions();
 }
 
 function toggleMobileMenu() {
@@ -413,7 +404,7 @@ function changeCategoryPage(catSlug, pageNum) {
 }
 
 function openProductDetailModal(productId) {
-    const product = (window.allProductsData || globalProductsForCalc || []).find(p => String(p.id) === String(productId));
+    const product = (window.allProductsData || globalProducts || []).find(p => String(p.id) === String(productId));
     if (!product) return;
 
     const name = product.name_vi || product.name_en || product.name || 'Sản phẩm xuất khẩu';
@@ -530,9 +521,9 @@ function renderProductCard(prod) {
     `;
 }
 
-// ================= 5. CBM & CONTAINER CALCULATOR =================
+// ================= 5. DANH SÁCH SẢN PHẨM (FINDER + RFQ) =================
 
-async function loadProductsIntoCalculator() {
+async function loadProducts() {
     try {
         const { data: products, error } = await window.dbClient
             .from('products')
@@ -540,423 +531,211 @@ async function loadProductsIntoCalculator() {
             .order('created_at', { ascending: true });
 
         if (error) throw error;
-        
-        globalProductsForCalc = products || [];
-        window.allProductsData = products || [];
 
-        const calcSelectEl = document.getElementById('calcProductType');
-        const rfqSelectEl = document.getElementById('rfqProdSelect');
+        globalProducts = products || [];
+        window.allProductsData = globalProducts;
+    } catch (err) {
+        console.error('Lỗi tải danh sách sản phẩm:', err.message);
+    }
+    // Vẫn render để khách luôn có option "Sản phẩm khác" dù DB lỗi
+    renderProductSelects();
+}
 
-        if (calcSelectEl) calcSelectEl.innerHTML = '';
-        if (rfqSelectEl) rfqSelectEl.innerHTML = '<option value=""> Chọn sản phẩm quan tâm </option>';
+// Đổ sản phẩm vào cả 2 dropdown (Quick Finder + RFQ), cuối danh sách là option "Sản phẩm khác"
+function renderProductSelects() {
+    const t = i18nData[currentLang] || i18nData.vi;
 
-        globalProductsForCalc.forEach((item, index) => {
-            const productId = item.id; // Lấy ID chuẩn từ DB
-            const productName = (item.name_vi || item.name || item.name_en || 'Sản phẩm xuất khẩu').trim();
-            const packingInfo = item.packaging ? ` (${item.packaging})` : '';
-            const fullLabel = `${productName}${packingInfo}`;
+    [
+        { id: 'finderProductSelect', withPacking: false },
+        { id: 'rfqProdSelect',        withPacking: true  }
+    ].forEach(({ id, withPacking }) => {
+        const sel = document.getElementById(id);
+        if (!sel) return;
 
-            if (calcSelectEl) {
-                const opt1 = document.createElement('option');
-                opt1.value = index;
-                opt1.text = fullLabel;
-                if (index === 0) opt1.selected = true;
-                calcSelectEl.appendChild(opt1);
-            }
+        const prev = sel.value; // giữ lại lựa chọn khi đổi ngôn ngữ
+        sel.innerHTML = '';
+        sel.add(new Option(t.opt_select_prod, ''));
 
-            if (rfqSelectEl) {
-                const opt2 = document.createElement('option');
-                opt2.value = productId; // Gán value bằng ID sản phẩm để kết nối với bảng companies
-                opt2.text = fullLabel;
-                rfqSelectEl.appendChild(opt2);
-            }
+        globalProducts.forEach(item => {
+            const name = (item.name_vi || item.name || item.name_en || 'Sản phẩm xuất khẩu').trim();
+            const packing = (withPacking && item.packaging) ? ` (${item.packaging})` : '';
+            sel.add(new Option(`${name}${packing}`, item.id));
         });
 
-        runCbmCalculator();
-    } catch (err) {
-        console.error('Lỗi tải sản phẩm cho calculator:', err.message);
-    }
-}
+        sel.add(new Option(t.opt_custom_prod, CUSTOM_PRODUCT_VALUE));
 
-function runCbmCalculator() {
-    const selectEl = document.getElementById('calcProductType');
-    const cartonInput = document.getElementById('calcCartonInput');
-    const qty = cartonInput ? parseFloat(cartonInput.value) || 0 : 1000;
-
-    let unitCbm = 0.038; 
-    let unitGw = 7.5; 
-
-    if (selectEl && globalProductsForCalc && globalProductsForCalc[selectEl.value]) {
-        const prod = globalProductsForCalc[selectEl.value];
-        unitCbm = parseFloat(prod.cbm_per_unit || 0.038);
-        unitGw = parseFloat(prod.gw_per_unit || 7.5);
-    }
-
-    const totalCbm = (qty * unitCbm).toFixed(1);
-    const totalGw = Math.round(qty * unitGw).toLocaleString('en-US');
-
-    let contRec = "Gom hàng lẻ LCL";
-    if (totalCbm > 65) {
-        const cont40Count = Math.ceil(totalCbm / 65);
-        contRec = `${cont40Count} x 40ft HC`;
-    } else if (totalCbm >= 25) {
-        contRec = "1 x 40ft HC";
-    } else if (totalCbm >= 15) {
-        contRec = "1 x 20ft FCL";
-    }
-
-    const cbmEl = document.getElementById('resTotalCbm');
-    const gwEl = document.getElementById('resTotalGw');
-    const contEl = document.getElementById('resContRecommendation');
-    const leadEl = document.getElementById('resLeadTime');
-
-    if (cbmEl) cbmEl.innerText = `${totalCbm} CBM`;
-    if (gwEl) gwEl.innerText = `${totalGw} Kg`;
-    if (contEl) contEl.innerText = contRec;
-    if (leadEl) leadEl.innerText = (totalCbm > 50) ? "20 - 25 Ngày" : "15 - 20 Ngày";
-}
-
-function sendCalcToRFQ() {
-    const cartonInput = document.getElementById('calcCartonInput');
-    const qty = cartonInput ? cartonInput.value : '1000';
-    const cbmText = document.getElementById('resTotalCbm')?.innerText || '';
-    const contText = document.getElementById('resContRecommendation')?.innerText || '';
-    const shippingMethodSelect = document.getElementById('calcShippingMethod');
-    const shippingMethodValue = shippingMethodSelect ? shippingMethodSelect.value : '';
-    
-    const calcProductSelect = document.getElementById('calcProductType');
-    let selectedProductId = '';
-    
-    if (calcProductSelect && globalProductsForCalc && globalProductsForCalc.length > 0) {
-        const prod = globalProductsForCalc[calcProductSelect.value];
-        if (prod) selectedProductId = prod.id;
-    }
-
-    // 1. Reset sạch toàn bộ Form RFQ trước khi điền dữ liệu tính toán CBM
-    const mainForm = document.getElementById('rfqMainForm');
-    if (mainForm) mainForm.reset();
-
-    // 2. Đổ dữ liệu sản phẩm từ Calculator sang RFQ
-    const rfqProdSelect = document.getElementById('rfqProdSelect');
-    if (rfqProdSelect && selectedProductId) {
-        rfqProdSelect.value = selectedProductId;
-        handleRFQProductChange({ target: rfqProdSelect });
-    }
-
-    // 3. Điền số lượng và quy cách container vào ô sản lượng
-    const qtyInput = document.getElementById('rfqQty');
-    if (qtyInput) {
-        qtyInput.value = `${qty} Thùng (~${cbmText}, Khuyên dùng: ${contText})`;
-    }
-
-    // 4. Đồng bộ phương thức vận chuyển nếu form RFQ có ô này
-    const rfqShippingMethod = document.getElementById('rfqShippingMethod');
-    if (rfqShippingMethod && shippingMethodValue) {
-        rfqShippingMethod.value = shippingMethodValue;
-    }
-
-    // 5. Cuộn mượt màn hình xuống form RFQ
-    scrollToRFQ();
-}
-
-// ================= 6. QUICK SOURCING FINDER & COMPANIES =================
-
-async function loadAllSystemData() {
-    try {
-        const [prodRes, compRes] = await Promise.all([
-            window.dbClient.from('products').select('*').order('created_at', { ascending: true }),
-            window.dbClient.from('companies').select('*').order('name', { ascending: true })
-        ]);
-
-        if (!prodRes.error && prodRes.data) globalProductsForCalc = prodRes.data;
-        if (!compRes.error && compRes.data && compRes.data.length > 0) {
-            globalCompaniesList = compRes.data;
-        } else {
-            globalCompaniesList = fallbackCompanies;
+        if (prev && Array.from(sel.options).some(o => o.value === String(prev))) {
+            sel.value = prev;
         }
+    });
 
-        const finderProdSelect = document.getElementById('finderProductSelect');
-        if (finderProdSelect && globalProductsForCalc.length > 0) {
-            finderProdSelect.innerHTML = '<option value=""> Chọn sản phẩm OEM / Sourcing </option>';
-            globalProductsForCalc.forEach((item, index) => {
-                const productName = (item.name_vi || item.name || item.name_en || 'Sản phẩm').trim();
-                const opt = document.createElement('option');
-                opt.value = index;
-                opt.text = productName;
-                finderProdSelect.appendChild(opt);
-            });
-        }
-    } catch (err) {
-        console.error('Lỗi tải dữ liệu hệ thống:', err.message);
-        globalCompaniesList = fallbackCompanies;
+    handleQuickProductChange();
+    handleRFQProductChange();
+}
+
+// Đổ danh sách thị trường vào cả 2 dropdown
+function renderMarketOptions() {
+    const isEn = currentLang === 'en';
+    const t = i18nData[currentLang] || i18nData.vi;
+
+    ['quickTargetMarket', 'rfqTargetMarket'].forEach(id => {
+        const sel = document.getElementById(id);
+        if (!sel) return;
+
+        const prev = sel.value;
+        sel.innerHTML = '';
+        sel.add(new Option(t.opt_select_market, ''));
+        TARGET_MARKETS.forEach(m => sel.add(new Option(isEn ? m.en : m.value, m.value)));
+        if (prev) sel.value = prev;
+    });
+
+    handleQuickMarketChange();
+    handleRFQMarketChange();
+}
+
+// Khi chọn "Khác": ô dropdown được thay bằng ô nhập ngay tại chỗ (cùng vị trí, cùng kích thước)
+function applyOtherMode({ selectId, boxId, wrapId, inputId, isOther, required }) {
+    const sel = document.getElementById(selectId);
+    const box = document.getElementById(boxId);
+    const wrap = document.getElementById(wrapId);
+    const input = document.getElementById(inputId);
+    const userPicked = !!sel && document.activeElement === sel;
+
+    if (box) box.classList.toggle('hidden', isOther);
+    if (wrap) wrap.classList.toggle('hidden', !isOther);
+    if (input) {
+        input.required = !!(isOther && required);
+        if (!isOther) input.value = '';
+        else if (userPicked) input.focus();
     }
 }
 
-// Hàm kiểm tra xem đã chọn đủ Nhà máy và Thị trường chưa để mở khóa nút bấm
+// Bấm mũi tên ở ô nhập -> quay lại dropdown chọn từ danh sách
+function backToList(selectId) {
+    const sel = document.getElementById(selectId);
+    if (!sel) return;
+    sel.value = '';
+    sel.dispatchEvent(new Event('change', { bubbles: true }));
+    sel.focus();
+}
+
+function handleQuickMarketChange() {
+    const sel = document.getElementById('quickTargetMarket');
+    applyOtherMode({ selectId: 'quickTargetMarket', boxId: 'quickMarketBox', wrapId: 'quickMarketCustomWrap',
+        inputId: 'quickMarketCustom', isOther: !!sel && sel.value === OTHER_MARKET_VALUE, required: false });
+}
+
+function handleRFQMarketChange() {
+    const sel = document.getElementById('rfqTargetMarket');
+    applyOtherMode({ selectId: 'rfqTargetMarket', boxId: 'rfqMarketBox', wrapId: 'rfqMarketCustomWrap',
+        inputId: 'rfqMarketCustom', isOther: !!sel && sel.value === OTHER_MARKET_VALUE, required: true });
+}
+
+// Lấy giá trị thị trường cuối cùng (nếu "khác" thì ghép với nội dung khách nhập)
+function getMarketValue(selectId, inputId) {
+    const sel = document.getElementById(selectId);
+    if (!sel || sel.value === '') return '';
+    if (sel.value === OTHER_MARKET_VALUE) {
+        const txt = document.getElementById(inputId)?.value.trim() || '';
+        return txt ? `${OTHER_MARKET_VALUE}: ${txt}` : OTHER_MARKET_VALUE;
+    }
+    return sel.value;
+}
+
+// ================= 6. QUICK SOURCING FINDER (HERO SECTION) =================
+
+const FINDER_BTN_ACTIVE = "w-full bg-gradient-to-r from-brand-blue to-brand-emerald hover:brightness-110 active:scale-[0.99] text-white font-bold py-3.5 rounded-xl shadow-lg shadow-brand-emerald/10 transition-all flex items-center justify-center gap-2 mt-2 text-xs cursor-pointer";
+const FINDER_BTN_DISABLED = "w-full bg-slate-700 text-slate-400 opacity-50 cursor-not-allowed py-3.5 rounded-xl shadow-lg transition-all flex items-center justify-center gap-2 mt-2 text-xs";
+
+// Mở khóa nút khi đã chọn sản phẩm (hoặc đã nhập sản phẩm tự do)
 function checkFinderFormValid() {
-    const supplierSelect = document.getElementById('quickSupplierSelect');
-    const marketSelect = document.getElementById('quickTargetMarket');
+    const prodSelect = document.getElementById('finderProductSelect');
+    const customInput = document.getElementById('finderCustomProduct');
     const submitBtn = document.getElementById('finderSubmitBtn');
+    if (!prodSelect || !submitBtn) return;
 
-    if (!supplierSelect || !marketSelect || !submitBtn) return;
+    const isCustom = prodSelect.value === CUSTOM_PRODUCT_VALUE;
+    const valid = prodSelect.value !== '' &&
+        (!isCustom || (customInput && customInput.value.trim() !== ''));
 
-    const hasSupplier = supplierSelect.value !== "" && supplierSelect.value !== null;
-    const hasMarket = marketSelect.value !== "" && marketSelect.value !== null;
-
-    if (hasSupplier && hasMarket) {
-        // Mở khóa nút bấm (Active)
-        submitBtn.disabled = false;
-        submitBtn.className = "w-full bg-gradient-to-r from-brand-blue to-brand-emerald hover:brightness-110 active:scale-[0.99] text-white font-bold py-3.5 rounded-xl shadow-lg shadow-brand-emerald/10 transition-all flex items-center justify-center gap-2 mt-2 text-xs cursor-pointer";
-    } else {
-        // Khóa nút bấm (Disabled)
-        submitBtn.disabled = true;
-        submitBtn.className = "w-full bg-slate-700 text-slate-400 opacity-50 cursor-not-allowed py-3.5 rounded-xl shadow-lg transition-all flex items-center justify-center gap-2 mt-2 text-xs";
-    }
+    submitBtn.disabled = !valid;
+    submitBtn.className = valid ? FINDER_BTN_ACTIVE : FINDER_BTN_DISABLED;
 }
-// ================= QUICK SOURCING FINDER (HERO SECTION) =================
 
-// 1. Khi chọn sản phẩm trên Quick Finder -> Lọc nhà máy theo company_id
+// Khi đổi sản phẩm trên Quick Finder: chọn "Sản phẩm khác" thì ô chọn đổi thành ô nhập
 function handleQuickProductChange() {
     const prodSelect = document.getElementById('finderProductSelect');
-    const supplierSelect = document.getElementById('quickSupplierSelect');
-    if (!prodSelect || !supplierSelect) return;
+    if (!prodSelect) return;
 
-    const selectedIndex = prodSelect.value;
-    const isEn = typeof currentLang !== 'undefined' && currentLang === 'en';
+    applyOtherMode({ selectId: 'finderProductSelect', boxId: 'finderProductBox', wrapId: 'finderCustomWrap',
+        inputId: 'finderCustomProduct', isOther: prodSelect.value === CUSTOM_PRODUCT_VALUE, required: false });
 
-    if (selectedIndex === "") {
-        supplierSelect.innerHTML = isEn ? '<option value="">Please select product first</option>' : '<option value="">Vui lòng chọn sản phẩm trước</option>';
-        handleQuickSupplierChange();
-        checkFinderFormValid(); // Kiểm tra lại trạng thái nút
-        return;
-    }
-
-    const selectedProduct = globalProductsForCalc[selectedIndex];
-    const companies = globalCompaniesList.length > 0 ? globalCompaniesList : fallbackCompanies;
-
-    let matchingCompanies = [];
-    if (selectedProduct && selectedProduct.company_id) {
-        matchingCompanies = companies.filter(c => String(c.id) === String(selectedProduct.company_id));
-    }
-
-    if (matchingCompanies.length === 0) {
-        matchingCompanies = companies;
-    }
-
-    window.currentQuickCompanies = matchingCompanies;
-
-    supplierSelect.innerHTML = isEn ? '<option value="">Select partner factory</option>' : '<option value="">Chọn nhà máy đối tác</option>';
-    matchingCompanies.forEach((comp) => {
-        const opt = document.createElement('option');
-        opt.value = comp.name;
-        opt.text = `🏢 ${comp.name} (${comp.location || 'Việt Nam'})`;
-        supplierSelect.appendChild(opt);
-    });
-
-    if (matchingCompanies.length > 0) {
-        supplierSelect.selectedIndex = 0;
-        handleQuickSupplierChange();
-    } else {
-        checkFinderFormValid();
-    }
-}
-
-function handleQuickSupplierChange() {
-    const supplierSelect = document.getElementById('quickSupplierSelect');
-    const certsDisplayEl = document.getElementById('quickCertsDisplay');
-    const marketSelect = document.getElementById('quickTargetMarket');
-
-    if (!supplierSelect || !marketSelect) return;
-
-    const selectedCompanyName = supplierSelect.value;
-    const isEn = typeof currentLang !== 'undefined' && currentLang === 'en';
-
-    if (!selectedCompanyName) {
-        if (certsDisplayEl) certsDisplayEl.innerHTML = `<span class="text-[11px] text-slate-400">${isEn ? 'Select factory to view certs...' : 'Chọn nhà máy để xem chứng chỉ...'}</span>`;
-        marketSelect.innerHTML = `<option value="">${isEn ? 'Select factory to view markets' : 'Chọn nhà máy để xem thị trường phù hợp'}</option>`;
-        checkFinderFormValid(); // Khóa nút nếu chưa chọn nhà máy
-        return;
-    }
-
-    const companies = window.currentQuickCompanies || (globalCompaniesList.length > 0 ? globalCompaniesList : fallbackCompanies);
-    const selectedComp = companies.find(c => c.name === selectedCompanyName);
-
-    if (!selectedComp) return;
-
-    if (certsDisplayEl) {
-        let certs = selectedComp.certs || [];
-        if (typeof certs === 'string') {
-            try { certs = JSON.parse(certs); } catch(e) { certs = [certs]; }
-        }
-        certsDisplayEl.innerHTML = certs.length > 0 
-            ? certs.map(c => `<span class="px-2.5 py-0.5 bg-blue-500/10 border border-blue-500/30 text-blue-400 text-[11px] font-bold rounded-md">✓ ${c}</span>`).join(' ')
-            : `<span class="text-[11px] text-slate-400">${isEn ? 'Export standard certified' : 'Đã kiểm định chuẩn xuất khẩu'}</span>`;
-    }
-
-    marketSelect.innerHTML = '';
-    let markets = selectedComp.target_markets || [];
-    if (typeof markets === 'string') {
-        try {
-            markets = JSON.parse(markets);
-        } catch (e) {
-            markets = [markets];
-        }
-    }
-
-    if (!Array.isArray(markets) || markets.length === 0) {
-        markets = ["Mỹ / Canada (FDA)", "Châu Âu (EU Standard)", "Trung Đông (Halal Cert)", "Nhật / Hàn / ASEAN"];
-    }
-
-    markets.forEach(m => {
-        const opt = document.createElement('option');
-        opt.value = m;
-        opt.text = m;
-        marketSelect.appendChild(opt);
-    });
-
-    // Sau khi nạp xong thị trường, gọi hàm kiểm tra để mở khóa nút bấm
     checkFinderFormValid();
 }
 
-// Bổ sung sự kiện lắng nghe khi người dùng thay đổi thị trường đích (Target Market)
-document.addEventListener('DOMContentLoaded', () => {
-    const marketSelect = document.getElementById('quickTargetMarket');
-    if (marketSelect) {
-        marketSelect.addEventListener('change', checkFinderFormValid);
-    }
-});
-// 3. Khi bấm "Kết Nối Nhà Máy & Nhận RFQ" ở Quick Finder -> Đồng bộ sang Form RFQ phía dưới và cuộn xuống
+// Bấm "Nhận Báo Giá (RFQ)" ở Quick Finder -> đồng bộ sang Form RFQ phía dưới và cuộn xuống
 function handleHeroFinder(event) {
     event.preventDefault();
+    const t = i18nData[currentLang] || i18nData.vi;
+
     const finderProdSelect = document.getElementById('finderProductSelect');
-    const quickSupplierSelect = document.getElementById('quickSupplierSelect');
+    const finderCustom = document.getElementById('finderCustomProduct');
     const quickMarketSelect = document.getElementById('quickTargetMarket');
 
-    if (!finderProdSelect || finderProdSelect.value === "") {
-        alert("Vui lòng chọn sản phẩm cần sourcing!");
+    if (!finderProdSelect || finderProdSelect.value === '') {
+        alert(t.alert_select_prod);
         return;
     }
 
-    const selectedIndex = finderProdSelect.value;
-    const selectedProduct = globalProductsForCalc[selectedIndex];
+    const isCustom = finderProdSelect.value === CUSTOM_PRODUCT_VALUE;
+    const customText = finderCustom ? finderCustom.value.trim() : '';
+    if (isCustom && !customText) {
+        alert(t.alert_enter_custom);
+        return;
+    }
 
-    if (!selectedProduct) return;
-
-    // 1. Reset sạch toàn bộ Form RFQ trước khi điền dữ liệu mới
+    // 1. Reset form RFQ trước khi điền dữ liệu mới
     const mainForm = document.getElementById('rfqMainForm');
     if (mainForm) mainForm.reset();
 
-    // 2. Đồng bộ sản phẩm sang Form RFQ bằng ID chính xác
+    // 2. Đồng bộ sản phẩm (có sẵn hoặc tự nhập)
     const rfqProdSelect = document.getElementById('rfqProdSelect');
     if (rfqProdSelect) {
-        rfqProdSelect.value = selectedProduct.id;
-        handleRFQProductChange({ target: rfqProdSelect }); // Tự động load nhà máy phù hợp
+        rfqProdSelect.value = finderProdSelect.value;
+        handleRFQProductChange();
+        if (isCustom) {
+            const rfqCustom = document.getElementById('rfqCustomProduct');
+            if (rfqCustom) rfqCustom.value = customText;
+        }
     }
 
-    // 3. Đồng bộ Nhà máy sang Form RFQ
-    const rfqSupplier = document.getElementById('rfqSupplier');
-    if (quickSupplierSelect && quickSupplierSelect.value !== "" && rfqSupplier) {
-        rfqSupplier.value = quickSupplierSelect.value;
-        handleRFQSupplierChange(); // Tự động load thị trường tương ứng
-    }
-
-    // 4. Đồng bộ Thị trường xuất khẩu đích
+    // 3. Đồng bộ thị trường đích
     const rfqTargetMarket = document.getElementById('rfqTargetMarket');
-    if (quickMarketSelect && quickMarketSelect.value !== "" && rfqTargetMarket) {
+    if (quickMarketSelect && quickMarketSelect.value !== '' && rfqTargetMarket) {
         rfqTargetMarket.value = quickMarketSelect.value;
+        handleRFQMarketChange();
+        if (quickMarketSelect.value === OTHER_MARKET_VALUE) {
+            const rfqMarketCustom = document.getElementById('rfqMarketCustom');
+            const quickMarketCustom = document.getElementById('quickMarketCustom');
+            if (rfqMarketCustom && quickMarketCustom) rfqMarketCustom.value = quickMarketCustom.value.trim();
+        }
+    } else {
+        handleRFQMarketChange();
     }
 
-    // 5. Cuộn mượt màn hình xuống form RFQ
+    // 4. Cuộn xuống form RFQ
     scrollToRFQ();
 }
-// ================= 7. RFQ FORM & DYNAMIC COMPANY / MARKETS MAPPING =================
 
-function handleRFQProductChange(event) {
-    const selectedProductId = event ? event.target.value : '';
-    const supplierSelect = document.getElementById('rfqSupplier');
-    const marketSelect = document.getElementById('rfqTargetMarket');
+// ================= 7. RFQ FORM =================
 
-    if (!supplierSelect) return;
+// Khi đổi sản phẩm trong RFQ: chọn "Sản phẩm khác" thì ô chọn đổi thành ô nhập
+function handleRFQProductChange() {
+    const sel = document.getElementById('rfqProdSelect');
+    if (!sel) return;
 
-    const isEn = typeof currentLang !== 'undefined' && currentLang === 'en';
-
-    if (!selectedProductId) {
-        supplierSelect.innerHTML = isEn ? '<option value="">Select partner factory</option>' : '<option value="">Chọn nhà máy đối tác</option>';
-        if (marketSelect) {
-            marketSelect.innerHTML = isEn ? '<option value="">Select factory to view markets</option>' : '<option value="">Chọn nhà máy để xem thị trường</option>';
-        }
-        return;
-    }
-
-    const products = window.allProductsData || globalProductsForCalc || [];
-    const companies = globalCompaniesList.length > 0 ? globalCompaniesList : fallbackCompanies;
-
-    const selectedProduct = products.find(p => String(p.id) === String(selectedProductId));
-
-    let matchingCompanies = [];
-    if (selectedProduct && selectedProduct.company_id) {
-        matchingCompanies = companies.filter(c => String(c.id) === String(selectedProduct.company_id));
-    }
-
-    if (matchingCompanies.length === 0) {
-        matchingCompanies = companies;
-    }
-
-    window.currentRFQCompanies = matchingCompanies;
-
-    supplierSelect.innerHTML = isEn ? '<option value="">Select partner factory</option>' : '<option value="">Chọn nhà máy đối tác</option>';
-    matchingCompanies.forEach((comp) => {
-        const opt = document.createElement('option');
-        opt.value = comp.name;
-        opt.text = `🏢 ${comp.name} (${comp.location || 'Việt Nam'})`;
-        supplierSelect.appendChild(opt);
-    });
-
-    if (matchingCompanies.length > 0) {
-        supplierSelect.selectedIndex = 1;
-        handleRFQSupplierChange();
-    }
-}
-
-function handleRFQSupplierChange() {
-    const supplierSelect = document.getElementById('rfqSupplier');
-    const marketSelect = document.getElementById('rfqTargetMarket');
-
-    if (!supplierSelect || !marketSelect) return;
-
-    const selectedCompanyName = supplierSelect.value;
-    const isEn = typeof currentLang !== 'undefined' && currentLang === 'en';
-
-    if (!selectedCompanyName) {
-        marketSelect.innerHTML = isEn ? '<option value="">Select factory to view markets</option>' : '<option value="">Chọn nhà máy để xem thị trường</option>';
-        return;
-    }
-
-    const companies = window.currentRFQCompanies || (globalCompaniesList.length > 0 ? globalCompaniesList : fallbackCompanies);
-    const selectedComp = companies.find(c => c.name === selectedCompanyName);
-
-    if (!selectedComp) return;
-
-    let markets = selectedComp.target_markets || [];
-    if (typeof markets === 'string') {
-        try {
-            markets = JSON.parse(markets);
-        } catch (e) {
-            markets = [markets];
-        }
-    }
-
-    if (!Array.isArray(markets) || markets.length === 0) {
-        markets = ["Mỹ / Canada (FDA)", "Châu Âu (EU Standard)", "Trung Đông (Halal Cert)", "Nhật / Hàn / ASEAN"];
-    }
-
-    marketSelect.innerHTML = '';
-    markets.forEach(m => {
-        const opt = document.createElement('option');
-        opt.value = m;
-        opt.text = m;
-        marketSelect.appendChild(opt);
-    });
+    applyOtherMode({ selectId: 'rfqProdSelect', boxId: 'rfqProdBox', wrapId: 'rfqCustomWrap',
+        inputId: 'rfqCustomProduct', isOther: sel.value === CUSTOM_PRODUCT_VALUE, required: true });
 }
 
 async function handleMainRFQSubmit(event) {
@@ -970,13 +749,15 @@ async function handleMainRFQSubmit(event) {
     
     const prodSelectEl = document.getElementById('rfqProdSelect');
     let productCategory = '';
-    if (prodSelectEl && prodSelectEl.selectedOptions.length > 0) {
+    if (prodSelectEl && prodSelectEl.value === CUSTOM_PRODUCT_VALUE) {
+        const customText = document.getElementById('rfqCustomProduct')?.value.trim() || '';
+        productCategory = `Sản phẩm khác (khách tự nhập): ${customText}`;
+    } else if (prodSelectEl && prodSelectEl.selectedOptions.length > 0) {
         productCategory = prodSelectEl.selectedOptions[0].text;
     }
 
-    let supplier = document.getElementById('rfqSupplier')?.value || '';
     const quantity = document.getElementById('rfqQty')?.value.trim() || '';
-    const targetMarket = document.getElementById('rfqTargetMarket')?.value || '';
+    const targetMarket = getMarketValue('rfqTargetMarket', 'rfqMarketCustom');
     const shippingMethod = document.getElementById('rfqShippingMethod')?.value || '';
     const details = document.getElementById('rfqDetails')?.value.trim() || '';
 
@@ -989,7 +770,6 @@ async function handleMainRFQSubmit(event) {
         phone: phone,
         incoterm: incoterm,
         product_category: productCategory,
-        company_name: supplier,
         quantity: quantity,
         target_market: targetMarket,
         shipping_method: shippingMethod,
@@ -1027,6 +807,8 @@ async function handleMainRFQSubmit(event) {
 
         const mainForm = document.getElementById('rfqMainForm');
         if (mainForm) mainForm.reset();
+        handleRFQProductChange();
+        handleRFQMarketChange();
         if (alertBox) alertBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 
     } catch (err) {
