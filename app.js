@@ -662,6 +662,17 @@ function checkFinderFormValid() {
     submitBtn.className = valid ? FINDER_BTN_ACTIVE : FINDER_BTN_DISABLED;
 }
 
+// Gõ sản phẩm tự do (hoặc dán/autofill) -> mở khóa nút ngay, không cần chọn lại dropdown
+document.addEventListener('DOMContentLoaded', () => {
+    const customInput = document.getElementById('finderCustomProduct');
+    if (customInput) {
+        ['input', 'change', 'keyup', 'paste'].forEach(evt => {
+            customInput.addEventListener(evt, () => setTimeout(checkFinderFormValid, 0));
+        });
+    }
+    checkFinderFormValid();
+});
+
 // Khi đổi sản phẩm trên Quick Finder: chọn "Sản phẩm khác" thì ô chọn đổi thành ô nhập
 function handleQuickProductChange() {
     const prodSelect = document.getElementById('finderProductSelect');
@@ -738,10 +749,82 @@ function handleRFQProductChange() {
         inputId: 'rfqCustomProduct', isOther: sel.value === CUSTOM_PRODUCT_VALUE, required: true });
 }
 
+// ---- Popup "Gửi thành công" nổi bật + trạng thái nút khi gửi ----
+let rfqSubmitting = false;
+
+function ensureRfqToastStyle() {
+    if (document.getElementById('rfqToastStyle')) return;
+    const st = document.createElement('style');
+    st.id = 'rfqToastStyle';
+    st.textContent = `
+        @keyframes rfqPop { 0% { transform: scale(.7); opacity: 0 } 60% { transform: scale(1.05); opacity: 1 } 100% { transform: scale(1) } }
+        @keyframes rfqDraw { to { stroke-dashoffset: 0 } }
+        @keyframes rfqSpin { to { transform: rotate(360deg) } }
+        #rfqSuccessOverlay { position: fixed; inset: 0; z-index: 99999; display: flex; align-items: center; justify-content: center;
+            background: rgba(15,23,42,.55); backdrop-filter: blur(3px); padding: 16px; }
+        #rfqSuccessOverlay .rfq-card { background: #fff; color: #0f172a; border-radius: 20px; max-width: 400px; width: 100%;
+            padding: 32px 24px 24px; text-align: center; box-shadow: 0 25px 60px rgba(0,0,0,.35); animation: rfqPop .45s ease-out; }
+        #rfqSuccessOverlay .rfq-check { width: 76px; height: 76px; border-radius: 50%; background: #10b981; margin: 0 auto 16px;
+            display: flex; align-items: center; justify-content: center; box-shadow: 0 0 0 8px rgba(16,185,129,.18); }
+        #rfqSuccessOverlay .rfq-check path { stroke: #fff; stroke-width: 5; fill: none; stroke-linecap: round; stroke-linejoin: round;
+            stroke-dasharray: 48; stroke-dashoffset: 48; animation: rfqDraw .5s .25s ease-out forwards; }
+        #rfqSuccessOverlay h3 { font-size: 18px; font-weight: 800; margin: 0 0 8px; color: #047857; }
+        #rfqSuccessOverlay p { font-size: 13px; line-height: 1.5; margin: 0; color: #475569; }
+        #rfqSuccessOverlay .rfq-time { display: inline-block; margin-top: 12px; padding: 4px 10px; border-radius: 999px;
+            background: #ecfdf5; color: #047857; font-size: 11px; font-weight: 700; }
+        #rfqSuccessOverlay button { margin-top: 18px; width: 100%; padding: 12px; border: 0; border-radius: 12px; cursor: pointer;
+            background: #0b5fa5; color: #fff; font-weight: 700; font-size: 13px; }
+        .rfq-spinner { display: inline-block; width: 14px; height: 14px; margin-right: 8px; vertical-align: -2px;
+            border: 2px solid rgba(255,255,255,.5); border-top-color: #fff; border-radius: 50%; animation: rfqSpin .7s linear infinite; }
+    `;
+    document.head.appendChild(st);
+}
+
+function showRfqSuccessPopup(texts, isEn) {
+    ensureRfqToastStyle();
+    const old = document.getElementById('rfqSuccessOverlay');
+    if (old) old.remove();
+
+    const time = new Date().toLocaleTimeString(isEn ? 'en-GB' : 'vi-VN', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    const sentAt = isEn ? `Sent at ${time}` : `Đã gửi lúc ${time}`;
+    const closeTxt = isEn ? 'Close' : 'Đóng';
+
+    const overlay = document.createElement('div');
+    overlay.id = 'rfqSuccessOverlay';
+    overlay.innerHTML = `
+        <div class="rfq-card" role="alertdialog" aria-live="assertive">
+            <div class="rfq-check"><svg width="40" height="40" viewBox="0 0 40 40"><path d="M9 21 L17 29 L31 12"/></svg></div>
+            <h3>${texts.rfq_success_title}</h3>
+            <p>${texts.rfq_success_desc}</p>
+            <span class="rfq-time">${sentAt}</span>
+            <button type="button">${closeTxt}</button>
+        </div>`;
+    const close = () => overlay.remove();
+    overlay.addEventListener('click', e => { if (e.target === overlay) close(); });
+    overlay.querySelector('button').addEventListener('click', close);
+    document.body.appendChild(overlay);
+    setTimeout(close, 8000);
+}
+
 async function handleMainRFQSubmit(event) {
     event.preventDefault();
+    if (rfqSubmitting) return; // chặn bấm đúp
 
     const alertBox = document.getElementById('rfqAlertBox');
+    if (alertBox) alertBox.classList.add('hidden'); // xóa thông báo của lần gửi trước
+
+    const submitBtn = document.querySelector('#rfqMainForm button[type="submit"]');
+    const submitBtnHtml = submitBtn ? submitBtn.innerHTML : '';
+    const setSending = (on) => {
+        rfqSubmitting = on;
+        if (!submitBtn) return;
+        submitBtn.disabled = on;
+        submitBtn.style.opacity = on ? '.7' : '';
+        submitBtn.style.cursor = on ? 'not-allowed' : '';
+        if (on) submitBtn.innerHTML = `<span class="rfq-spinner"></span>${currentLang === 'en' ? 'Sending...' : 'Đang gửi...'}`;
+        else submitBtn.innerHTML = submitBtnHtml;
+    };
+    ensureRfqToastStyle();
     const companyName = document.getElementById('rfqComp')?.value.trim() || '';
     const email = document.getElementById('rfqMail')?.value.trim() || '';
     const phone = document.getElementById('rfqTel')?.value.trim() || '';
@@ -787,6 +870,7 @@ async function handleMainRFQSubmit(event) {
         return;
     }
 
+    setSending(true);
     try {
         const { error } = await supabaseClient
             .from('rfq_requests')
@@ -794,22 +878,13 @@ async function handleMainRFQSubmit(event) {
 
         if (error) throw error;
 
-        if (alertBox) {
-            alertBox.className = "p-4 rounded-xl text-xs font-medium bg-emerald-950/80 border border-emerald-500/50 text-emerald-300 flex items-center gap-3 shadow-lg";
-            alertBox.innerHTML = `
-                <div>
-                    <strong class="font-bold block text-emerald-200">${texts.rfq_success_title}</strong>
-                    ${texts.rfq_success_desc}
-                </div>
-            `;
-            alertBox.classList.remove('hidden');
-        }
-
         const mainForm = document.getElementById('rfqMainForm');
         if (mainForm) mainForm.reset();
         handleRFQProductChange();
         handleRFQMarketChange();
-        if (alertBox) alertBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+        // Hộp thông báo to, rõ ràng thay cho banner nhỏ cũ
+        showRfqSuccessPopup(texts, isEn);
 
     } catch (err) {
         console.error('Lỗi khi gửi RFQ:', err.message);
@@ -817,7 +892,10 @@ async function handleMainRFQSubmit(event) {
             alertBox.className = "p-4 rounded-xl text-xs font-medium bg-rose-950/80 border border-rose-500/50 text-rose-300 flex items-center gap-3 shadow-lg";
             alertBox.innerHTML = `<div><strong class="font-bold block text-rose-200">${texts.rfq_err_fail}</strong> Chi tiết: ${err.message}</div>`;
             alertBox.classList.remove('hidden');
+            alertBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         }
+    } finally {
+        setSending(false);
     }
 }
 
