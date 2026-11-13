@@ -276,6 +276,24 @@ function requestQuoteFor(productName) {
 
 // ================= 4. SUPABASE DATA & RENDER PRODUCTS =================
 
+// ---- Ảnh sản phẩm: lấy từ Supabase Storage (bucket "Img") ----
+const PRODUCT_IMG_BUCKET = 'Img';
+const PRODUCT_IMG_FALLBACK = 'https://placehold.co/600x400/0f172a/ffffff?text=SilViet+Product';
+
+// image_url trong DB có thể là: link đầy đủ (http...) HOẶC chỉ tên file trong bucket (vd: BanhPho.png)
+function getProductImageUrl(prod) {
+    const raw = (prod && prod.image_url ? String(prod.image_url) : '').trim();
+    if (!raw) return PRODUCT_IMG_FALLBACK;
+    if (/^(https?:)?\/\//i.test(raw) || raw.startsWith('data:')) return raw;
+    try {
+        const { data } = window.dbClient.storage.from(PRODUCT_IMG_BUCKET).getPublicUrl(raw);
+        return (data && data.publicUrl) || PRODUCT_IMG_FALLBACK;
+    } catch (e) {
+        console.error('Lỗi lấy ảnh từ Storage:', e);
+        return PRODUCT_IMG_FALLBACK;
+    }
+}
+
 async function loadDynamicCategories() {
     const tabsContainer = document.getElementById('categoryTabsContainer');
     const contentsContainer = document.getElementById('categoryContentsContainer');
@@ -411,7 +429,7 @@ function openProductDetailModal(productId) {
     const packaging = product.packaging || 'Thùng 10kg / PE Bag';
     const specsDetail = product.specs_detail || product.specs || 'Chuẩn xuất khẩu B2B';
     const specsCert = product.specs_cert || 'FDA, ISO 22000';
-    const img = product.image_url || 'https://images.unsplash.com/photo-1612927601601-6638404737ce?auto=format&fit=crop&w=600&q=80';
+    const img = getProductImageUrl(product);
 
     const details = Array.isArray(product.product_details) ? product.product_details[0] : product.product_details;
     const cartonSize = details?.carton_size || '37 x 45 x 35 cm';
@@ -478,7 +496,7 @@ function renderProductCard(prod) {
         ? (prod.specs_cert_en || prod.specs_cert || prod.certifications || 'FDA, ISO 22000') 
         : (prod.specs_cert || prod.certifications || 'FDA, ISO 22000');
 
-    const img = prod.image_url || 'https://images.unsplash.com/photo-1612927601601-6638404737ce?auto=format&fit=crop&w=600&q=80';
+    const img = getProductImageUrl(prod);
     const safeName = productName.replace(/'/g, "\\'");
 
     const labels = {
