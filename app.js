@@ -438,6 +438,7 @@ function openProductDetailModal(productId) {
     const storage = details?.storage || 'Bảo quản nơi khô ráo, thoáng mát, tránh ánh nắng trực tiếp.';
 
     document.getElementById('detailProductImage').src = img;
+    document.getElementById('detailProductImage').style.objectFit = 'contain';
     document.getElementById('detailThumb1').src = img;
     document.getElementById('detailProductName').innerText = name;
     document.getElementById('detailProductTag').innerText = product.category || 'SOURCING';
@@ -510,8 +511,8 @@ function renderProductCard(prod) {
     return `
         <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl overflow-hidden hover:border-brand-blue transition flex flex-col justify-between">
             <div>
-                <div onclick="openProductDetailModal('${prod.id}')" class="relative h-56 overflow-hidden bg-slate-100 dark:bg-slate-900 flex items-center justify-center cursor-pointer group">
-                    <img src="${img}" alt="${productName}" loading="lazy" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/600x400/0f172a/ffffff?text=SilViet+Product'">
+                <div onclick="openProductDetailModal('${prod.id}')" class="relative h-56 overflow-hidden bg-white flex items-center justify-center cursor-pointer group">
+                    <img src="${img}" alt="${productName}" loading="lazy" class="w-full h-full object-contain p-3" onerror="this.src='https://placehold.co/600x400/0f172a/ffffff?text=SilViet+Product'">
                     <span class="absolute top-3 right-3 px-2.5 py-1 rounded-md bg-white/90 text-brand-blue text-xs font-medium shadow-sm">
                         ${prod.tag || 'SOURCING'}
                     </span>
