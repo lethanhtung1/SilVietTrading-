@@ -6,20 +6,10 @@
     <title>SilViet Global Trade - B2B Sourcing & Export Connector</title>
     
     <!-- SEO & Verification -->
-     
     <meta name="google-site-verification" content="Rmol4DHgOm4TY90tdpiz0wHTq0eAQBq7JUbk8YEPblQ" />
     <meta name="description" content="SilViet Trading - Nền tảng B2B Sourcing & Export kết nối nhà máy sản xuất và nhà mua hàng quốc tế tại Việt Nam.">
     <link rel="icon" type="image/x-icon" href="./favicon.ico">
 <link rel="apple-touch-icon" href="./favicon.ico">
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "WebSite",
-  "name": "SilViet Trading",
-  "alternateName": ["SilViet Global Trade", "SilViet B2B"],
-  "url": "https://silviettrading.vercel.app/"
-}
-</script>
     <!-- 1. Google Fonts: Inter -->
     <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700&family=Pinyon+Script&display=swap" rel="stylesheet">
 
@@ -56,6 +46,10 @@
     <!-- Custom Inline Styles -->
     <style>
         body { font-family: 'Be Vietnam Pro', sans-serif; }
+        select optgroup { font-weight: 700; font-style: normal; color: #0b5fa5; background: #f1f5f9; }
+        select option { font-weight: 400; color: #0f172a; background: #ffffff; padding: 6px 10px; }
+        .dark select optgroup { color: #7dd3fc; background: #0f172a; }
+        .dark select option { color: #f8fafc; background: #1e293b; }
         .glass-panel {
             background: rgba(15, 23, 42, 0.85);
             backdrop-filter: blur(16px);
@@ -213,6 +207,7 @@ header nav{gap:1.75rem}header nav>*+*{margin-left:0!important}
                 <a href="#categories" class="hover:text-brand-blue transition-colors py-1" data-i18n="nav_products">Sản Phẩm Chủ Lực</a>
                 <a href="#services" class="hover:text-brand-blue transition-colors py-1" data-i18n="nav_services">Dịch Vụ OEM/ODM</a>
                 <a href="#rfq-form" class="hover:text-brand-emerald transition-colors py-1" data-i18n="nav_rfq">Liên Hệ RFQ</a>
+                <a href="about.html" class="hover:text-brand-blue transition-colors py-1" data-i18n="nav_about">Giới Thiệu</a>
             </nav>
 
             <!-- CTA Button -->
@@ -245,6 +240,7 @@ header nav{gap:1.75rem}header nav>*+*{margin-left:0!important}
             <a href="#categories" onclick="toggleMobileMenu()" class="block py-2 text-slate-700 dark:text-slate-300 font-medium hover:text-brand-blue" data-i18n="nav_products">Sản Phẩm Chủ Lực</a>
             <a href="#services" onclick="toggleMobileMenu()" class="block py-2 text-slate-700 dark:text-slate-300 font-medium hover:text-brand-blue" data-i18n="nav_services">Dịch Vụ OEM/ODM</a>
             <a href="#rfq-form" onclick="toggleMobileMenu()" class="block py-2 text-slate-700 dark:text-slate-300 font-medium hover:text-brand-emerald" data-i18n="nav_rfq">Liên Hệ RFQ</a>
+            <a href="about.html" onclick="toggleMobileMenu()" class="block py-2 text-slate-700 dark:text-slate-300 font-medium hover:text-brand-emerald" data-i18n="nav_about">Giới Thiệu</a>
             <div class="flex items-center gap-2 pt-2 border-t border-slate-200 dark:border-slate-800">
                <button id="langToggleBtn" onclick="toggleLanguage()" class="flex items-center gap-1.5 bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-xs px-2.5 py-1 rounded-full text-slate-800 dark:text-white transition border border-slate-300 dark:border-slate-700 cursor-pointer">
                     <i data-lucide="languages" class="w-3.5 h-3.5 text-brand-emeraldLight"></i>

@@ -25,6 +25,7 @@ const i18nData = {
         nav_products: "Sản Phẩm Chủ Lực",
         nav_services: "Dịch Vụ OEM/ODM",
         nav_rfq: "Liên Hệ RFQ",
+        nav_about: "Giới Thiệu",
         btn_rfq: "Gửi Yêu Cầu Báo Giá (RFQ)",
         
         // Video Fullscreen Section
@@ -100,6 +101,7 @@ const i18nData = {
         nav_products: "Core Products",
         nav_services: "OEM/ODM Services",
         nav_rfq: "Inquire RFQ",
+        nav_about: "About Us",
         btn_rfq: "Request a Quote (RFQ)",
 
         // Video Fullscreen Section
@@ -171,6 +173,7 @@ const i18nData = {
         foot_contact: "Sourcing Hub Headquarters"
     }
 };
+
 function updateStaticTexts(lang) {
     const texts = i18nData[lang];
     if (!texts) return;
@@ -276,11 +279,9 @@ function requestQuoteFor(productName) {
 
 // ================= 4. SUPABASE DATA & RENDER PRODUCTS =================
 
-// ---- Ảnh sản phẩm: lấy từ Supabase Storage (bucket "Img") ----
 const PRODUCT_IMG_BUCKET = 'Img';
 const PRODUCT_IMG_FALLBACK = 'https://placehold.co/600x400/0f172a/ffffff?text=SilViet+Product';
 
-// image_url trong DB có thể là: link đầy đủ (http...) HOẶC chỉ tên file trong bucket (vd: BanhPho.png)
 function getProductImageUrl(prod) {
     const raw = (prod && prod.image_url ? String(prod.image_url) : '').trim();
     if (!raw) return PRODUCT_IMG_FALLBACK;
@@ -388,7 +389,7 @@ async function loadDynamicCategories() {
 
                     const nextDisabled = currentPage === totalPages;
                     paginationHTML += `
-                        <button type="button" onclick="changeCategoryPage('${cat.slug}', ${currentPage + 1})" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-white text-slate-600 border border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700 transition ${nextDisabled ? 'opacity-40 cursor-not-allowed pointer-events-none' : 'hover:border-brand-blue cursor-pointer'}">
+                        <button type="button" onclick="changeCategoryPage('${cat.slug}', ${currentPage + 1})" class="px-3.5 py-1.5 rounded-lg text-xs font-bold bg-white text-slate-600 border border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700 transition ${nextDisabled ? 'opacity-40 cursor-not-allowed pointer-events-none' : 'hover:border-brand-blue cursor-pointer'}">
                             Next &raquo;
                         </button>
                     `;
@@ -512,7 +513,7 @@ function renderProductCard(prod) {
         <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl overflow-hidden hover:border-brand-blue transition flex flex-col justify-between">
             <div>
                 <div onclick="openProductDetailModal('${prod.id}')" class="relative h-56 overflow-hidden bg-white flex items-center justify-center cursor-pointer group">
-                    <img src="${img}" alt="${productName}" loading="lazy" class="w-full h-full object-contain p-3" onerror="this.src='https://placehold.co/600x400/0f172a/ffffff?text=SilViet+Product'">
+                    <img src="${img}" alt="${productName}" loading="lazy" class="w-full h-full object-contain p-3" style="filter:brightness(1.05);" onerror="this.src='https://placehold.co/600x400/0f172a/ffffff?text=SilViet+Product'">
                     <span class="absolute top-3 right-3 px-2.5 py-1 rounded-md bg-white/90 text-brand-blue text-xs font-medium shadow-sm">
                         ${prod.tag || 'SOURCING'}
                     </span>
@@ -556,35 +557,59 @@ async function loadProducts() {
     } catch (err) {
         console.error('Lỗi tải danh sách sản phẩm:', err.message);
     }
-    // Vẫn render để khách luôn có option "Sản phẩm khác" dù DB lỗi
     renderProductSelects();
 }
 
-// Đổ sản phẩm vào cả 2 dropdown (Quick Finder + RFQ), cuối danh sách là option "Sản phẩm khác"
 function renderProductSelects() {
     const t = i18nData[currentLang] || i18nData.vi;
 
     [
-        { id: 'finderProductSelect', withPacking: false },
-        { id: 'rfqProdSelect',        withPacking: true  }
-    ].forEach(({ id, withPacking }) => {
+        { id: 'finderProductSelect', withPacking: false, grouped: false },
+        { id: 'rfqProdSelect',        withPacking: true,  grouped: true  }
+    ].forEach(({ id, withPacking, grouped }) => {
         const sel = document.getElementById(id);
         if (!sel) return;
 
-        const prev = sel.value; // giữ lại lựa chọn khi đổi ngôn ngữ
+        const prev = sel.value;
         sel.innerHTML = '';
         sel.add(new Option(t.opt_select_prod, ''));
 
-        globalProducts.forEach(item => {
+        const GROUPS = [
+            { key: 'noodles',   vi: 'Nông Sản & Đồ Khô',          en: 'Agricultural & Dry Goods' },
+            { key: 'beverages', vi: 'Đồ Uống & Nước Giải Khát',   en: 'Beverages & Refreshments' },
+            { key: 'footwear',  vi: 'Giày Dép & Gia Công OEM',    en: 'Footwear & OEM Manufacturing' }
+        ];
+        const isEnSel = currentLang === 'en';
+        const makeOption = (item) => {
             const name = (item.name_vi || item.name || item.name_en || 'Sản phẩm xuất khẩu').trim();
             const packing = (withPacking && item.packaging) ? ` (${item.packaging})` : '';
-            sel.add(new Option(`${name}${packing}`, item.id));
-        });
+            return new Option(`${name}${packing}`, item.id);
+        };
+        const known = new Set(GROUPS.map(g => g.key));
+        if (grouped) {
+            GROUPS.forEach(g => {
+                const items = globalProducts.filter(p => p.category === g.key || p.category_slug === g.key);
+                if (items.length === 0) return;
+                const og = document.createElement('optgroup');
+                og.label = isEnSel ? g.en : g.vi;
+                items.forEach(item => og.appendChild(makeOption(item)));
+                sel.appendChild(og);
+            });
+            globalProducts.filter(p => !known.has(p.category) && !known.has(p.category_slug)).forEach(item => sel.add(makeOption(item)));
+        } else {
+            // Danh sách phẳng, không có tiêu đề nhóm
+            globalProducts.forEach(item => sel.add(makeOption(item)));
+        }
 
         sel.add(new Option(t.opt_custom_prod, CUSTOM_PRODUCT_VALUE));
 
         if (prev && Array.from(sel.options).some(o => o.value === String(prev))) {
             sel.value = prev;
+        }
+        
+        // Kích hoạt sự kiện cập nhật lại custom dropdown nếu đã được khởi tạo
+        if (typeof sel._svRebuild === 'function') {
+            sel._svRebuild();
         }
     });
 
@@ -592,7 +617,6 @@ function renderProductSelects() {
     handleRFQProductChange();
 }
 
-// Đổ danh sách thị trường vào cả 2 dropdown
 function renderMarketOptions() {
     const isEn = currentLang === 'en';
     const t = i18nData[currentLang] || i18nData.vi;
@@ -606,13 +630,16 @@ function renderMarketOptions() {
         sel.add(new Option(t.opt_select_market, ''));
         TARGET_MARKETS.forEach(m => sel.add(new Option(isEn ? m.en : m.value, m.value)));
         if (prev) sel.value = prev;
+
+        if (typeof sel._svRebuild === 'function') {
+            sel._svRebuild();
+        }
     });
 
     handleQuickMarketChange();
     handleRFQMarketChange();
 }
 
-// Khi chọn "Khác": ô dropdown được thay bằng ô nhập ngay tại chỗ (cùng vị trí, cùng kích thước)
 function applyOtherMode({ selectId, boxId, wrapId, inputId, isOther, required }) {
     const sel = document.getElementById(selectId);
     const box = document.getElementById(boxId);
@@ -629,7 +656,6 @@ function applyOtherMode({ selectId, boxId, wrapId, inputId, isOther, required })
     }
 }
 
-// Bấm mũi tên ở ô nhập -> quay lại dropdown chọn từ danh sách
 function backToList(selectId) {
     const sel = document.getElementById(selectId);
     if (!sel) return;
@@ -650,7 +676,6 @@ function handleRFQMarketChange() {
         inputId: 'rfqMarketCustom', isOther: !!sel && sel.value === OTHER_MARKET_VALUE, required: true });
 }
 
-// Lấy giá trị thị trường cuối cùng (nếu "khác" thì ghép với nội dung khách nhập)
 function getMarketValue(selectId, inputId) {
     const sel = document.getElementById(selectId);
     if (!sel || sel.value === '') return '';
@@ -666,7 +691,6 @@ function getMarketValue(selectId, inputId) {
 const FINDER_BTN_ACTIVE = "w-full bg-gradient-to-r from-brand-blue to-brand-emerald hover:brightness-110 active:scale-[0.99] text-white font-bold py-3.5 rounded-xl shadow-lg shadow-brand-emerald/10 transition-all flex items-center justify-center gap-2 mt-2 text-xs cursor-pointer";
 const FINDER_BTN_DISABLED = "w-full bg-slate-700 text-slate-400 opacity-50 cursor-not-allowed py-3.5 rounded-xl shadow-lg transition-all flex items-center justify-center gap-2 mt-2 text-xs";
 
-// Mở khóa nút khi đã chọn sản phẩm (hoặc đã nhập sản phẩm tự do)
 function checkFinderFormValid() {
     const prodSelect = document.getElementById('finderProductSelect');
     const customInput = document.getElementById('finderCustomProduct');
@@ -681,7 +705,6 @@ function checkFinderFormValid() {
     submitBtn.className = valid ? FINDER_BTN_ACTIVE : FINDER_BTN_DISABLED;
 }
 
-// Gõ sản phẩm tự do (hoặc dán/autofill) -> mở khóa nút ngay, không cần chọn lại dropdown
 document.addEventListener('DOMContentLoaded', () => {
     const customInput = document.getElementById('finderCustomProduct');
     if (customInput) {
@@ -692,7 +715,6 @@ document.addEventListener('DOMContentLoaded', () => {
     checkFinderFormValid();
 });
 
-// Khi đổi sản phẩm trên Quick Finder: chọn "Sản phẩm khác" thì ô chọn đổi thành ô nhập
 function handleQuickProductChange() {
     const prodSelect = document.getElementById('finderProductSelect');
     if (!prodSelect) return;
@@ -703,7 +725,6 @@ function handleQuickProductChange() {
     checkFinderFormValid();
 }
 
-// Bấm "Nhận Báo Giá (RFQ)" ở Quick Finder -> đồng bộ sang Form RFQ phía dưới và cuộn xuống
 function handleHeroFinder(event) {
     event.preventDefault();
     const t = i18nData[currentLang] || i18nData.vi;
@@ -724,11 +745,9 @@ function handleHeroFinder(event) {
         return;
     }
 
-    // 1. Reset form RFQ trước khi điền dữ liệu mới
     const mainForm = document.getElementById('rfqMainForm');
     if (mainForm) mainForm.reset();
 
-    // 2. Đồng bộ sản phẩm (có sẵn hoặc tự nhập)
     const rfqProdSelect = document.getElementById('rfqProdSelect');
     if (rfqProdSelect) {
         rfqProdSelect.value = finderProdSelect.value;
@@ -739,7 +758,6 @@ function handleHeroFinder(event) {
         }
     }
 
-    // 3. Đồng bộ thị trường đích
     const rfqTargetMarket = document.getElementById('rfqTargetMarket');
     if (quickMarketSelect && quickMarketSelect.value !== '' && rfqTargetMarket) {
         rfqTargetMarket.value = quickMarketSelect.value;
@@ -753,13 +771,11 @@ function handleHeroFinder(event) {
         handleRFQMarketChange();
     }
 
-    // 4. Cuộn xuống form RFQ
     scrollToRFQ();
 }
 
 // ================= 7. RFQ FORM =================
 
-// Khi đổi sản phẩm trong RFQ: chọn "Sản phẩm khác" thì ô chọn đổi thành ô nhập
 function handleRFQProductChange() {
     const sel = document.getElementById('rfqProdSelect');
     if (!sel) return;
@@ -768,7 +784,6 @@ function handleRFQProductChange() {
         inputId: 'rfqCustomProduct', isOther: sel.value === CUSTOM_PRODUCT_VALUE, required: true });
 }
 
-// ---- Popup "Gửi thành công" nổi bật + trạng thái nút khi gửi ----
 let rfqSubmitting = false;
 
 function ensureRfqToastStyle() {
@@ -827,10 +842,10 @@ function showRfqSuccessPopup(texts, isEn) {
 
 async function handleMainRFQSubmit(event) {
     event.preventDefault();
-    if (rfqSubmitting) return; // chặn bấm đúp
+    if (rfqSubmitting) return;
 
     const alertBox = document.getElementById('rfqAlertBox');
-    if (alertBox) alertBox.classList.add('hidden'); // xóa thông báo của lần gửi trước
+    if (alertBox) alertBox.classList.add('hidden');
 
     const submitBtn = document.querySelector('#rfqMainForm button[type="submit"]');
     const submitBtnHtml = submitBtn ? submitBtn.innerHTML : '';
@@ -902,7 +917,6 @@ async function handleMainRFQSubmit(event) {
         handleRFQProductChange();
         handleRFQMarketChange();
 
-        // Hộp thông báo to, rõ ràng thay cho banner nhỏ cũ
         showRfqSuccessPopup(texts, isEn);
 
     } catch (err) {
@@ -967,3 +981,225 @@ function toggleAudio() {
         if (audioIcon) audioIcon.innerHTML = mutedIconPath;
     }
 }
+
+// ================= 9. CUSTOM DROPDOWN (ĐÃ FIX LỖI KẸT & CHE KHUẤT) =================
+(function () {
+    const CSS = `
+    .sv-dd { position: relative; width: 100%; }
+    .sv-dd > select.sv-native { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; pointer-events: none; }
+    .sv-dd-btn { width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 10px;
+        text-align: left; font: inherit; padding: 12px 14px; border-radius: 12px; cursor: pointer;
+        color: #0f172a; background: #f8fafc; border: 1px solid #cbd5e1; outline: none;
+        transition: border-color .15s, box-shadow .15s, background .15s; }
+    .sv-dd-btn:hover { border-color: #0b5fa5; }
+    .sv-dd.open .sv-dd-btn, .sv-dd-btn:focus-visible { border-color: #0b5fa5; box-shadow: 0 0 0 3px rgba(11,95,165,.15); }
+    .sv-dd-btn.placeholder .sv-dd-label { color: #94a3b8; }
+    .sv-dd-label { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .sv-dd-chev { flex: none; width: 16px; height: 16px; color: #94a3b8; transition: transform .2s; }
+    .sv-dd.open .sv-dd-chev { transform: rotate(180deg); color: #0b5fa5; }
+    .sv-dd-panel { position: fixed; z-index: 9999; display: none;
+        max-height: 360px; overflow-y: auto; padding: 6px; border-radius: 14px; background: #ffffff;
+        border: 1px solid #e2e8f0; box-shadow: 0 16px 40px -8px rgba(15,23,42,.28); }
+    .sv-dd-panel.open { display: block; animation: svDdIn .14s ease-out; }
+    @keyframes svDdIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+    .sv-dd-group { padding: 8px 10px 4px; font-size: 11px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: #0b5fa5; }
+    .sv-dd-item { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 9px 10px;
+        border-radius: 9px; cursor: pointer; color: #1e293b; line-height: 1.35; }
+    .sv-dd-item.grouped { padding-left: 16px; }
+    .sv-dd-item.muted { color: #94a3b8; }
+    .sv-dd-item.active { background: #eff6ff; }
+    .sv-dd-item.selected { color: #0b5fa5; font-weight: 600; }
+    .sv-dd-check { flex: none; width: 15px; height: 15px; color: #0b5fa5; opacity: 0; }
+    .sv-dd-item.selected .sv-dd-check { opacity: 1; }
+    .sv-dd-panel::-webkit-scrollbar { width: 6px; }
+    .sv-dd-panel::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 8px; }
+    .dark .sv-dd-btn { color: #f8fafc; background: rgba(2,6,23,.9); border-color: #334155; }
+    .dark .sv-dd-btn:hover, .dark .sv-dd.open .sv-dd-btn { border-color: #34d399; }
+    .dark .sv-dd.open .sv-dd-btn, .dark .sv-dd-btn:focus-visible { box-shadow: 0 0 0 3px rgba(52,211,153,.18); }
+    .dark .sv-dd.open .sv-dd-chev { color: #34d399; }
+    .dark .sv-dd-panel { background: #0f172a; border-color: #334155; box-shadow: 0 16px 40px -8px rgba(0,0,0,.6); }
+    .dark .sv-dd-group { color: #7dd3fc; }
+    .dark .sv-dd-item { color: #e2e8f0; }
+    .dark .sv-dd-item.active { background: #1e293b; }
+    .dark .sv-dd-item.selected, .dark .sv-dd-check { color: #34d399; }
+    .dark .sv-dd-panel::-webkit-scrollbar-thumb { background: #475569; }
+    `;
+    const CHEV = '<svg class="sv-dd-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>';
+    const CHECK = '<svg class="sv-dd-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>';
+    const nativeValue = Object.getOwnPropertyDescriptor(HTMLSelectElement.prototype, 'value');
+
+    function enhance(sel) {
+        if (sel.dataset.svEnhanced) return;
+        sel.dataset.svEnhanced = '1';
+
+        const wrap = document.createElement('div');
+        wrap.className = 'sv-dd';
+        sel.parentNode.insertBefore(wrap, sel);
+        wrap.appendChild(sel);
+        sel.classList.add('sv-native');
+        sel.tabIndex = -1;
+
+        const old = wrap.nextElementSibling;
+        if (old && old.classList.contains('pointer-events-none') && old.querySelector('[data-lucide="chevron-down"]')) old.remove();
+
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'sv-dd-btn';
+        btn.setAttribute('aria-haspopup', 'listbox');
+        btn.setAttribute('aria-expanded', 'false');
+        const label = document.createElement('span');
+        label.className = 'sv-dd-label';
+        btn.appendChild(label);
+        btn.insertAdjacentHTML('beforeend', CHEV);
+
+        const panel = document.createElement('div');
+        panel.className = 'sv-dd-panel';
+        panel.setAttribute('role', 'listbox');
+
+        wrap.appendChild(btn);
+        // Panel nằm ở <body> để không bị card (overflow/transform) cắt hoặc che
+        document.body.appendChild(panel);
+
+        let items = [];
+        let activeIdx = -1;
+
+        function refreshLabel() {
+            const opt = sel.options[sel.selectedIndex];
+            label.textContent = opt ? opt.text.trim() : '';
+            btn.classList.toggle('placeholder', !opt || opt.value === '');
+            items.forEach(it => it.el.classList.toggle('selected', it.opt === opt));
+        }
+
+        function build() {
+            panel.innerHTML = '';
+            items = [];
+            const addItem = (opt, grouped) => {
+                const el = document.createElement('div');
+                el.className = 'sv-dd-item' + (grouped ? ' grouped' : '') + (opt.value === '' ? ' muted' : '');
+                el.setAttribute('role', 'option');
+                const t = document.createElement('span');
+                t.textContent = opt.text.trim();
+                el.appendChild(t);
+                el.insertAdjacentHTML('beforeend', CHECK);
+                if (opt.disabled) { el.style.opacity = '.45'; el.style.cursor = 'not-allowed'; }
+                el.addEventListener('mousedown', e => e.preventDefault());
+                el.addEventListener('click', () => { if (!opt.disabled) choose(opt); });
+                el.addEventListener('mouseenter', () => setActive(items.findIndex(i => i.el === el), false));
+                panel.appendChild(el);
+                items.push({ el, opt });
+            };
+            Array.from(sel.children).forEach(node => {
+                if (node.tagName === 'OPTGROUP') {
+                    const g = document.createElement('div');
+                    g.className = 'sv-dd-group';
+                    g.textContent = node.label;
+                    panel.appendChild(g);
+                    Array.from(node.children).forEach(o => addItem(o, true));
+                } else if (node.tagName === 'OPTION') {
+                    addItem(node, false);
+                }
+            });
+            refreshLabel();
+        }
+
+        sel._svRebuild = build;
+
+        function positionPanel() {
+            const r = btn.getBoundingClientRect();
+            const spaceBelow = window.innerHeight - r.bottom - 12;
+            const spaceAbove = r.top - 12;
+
+            panel.style.left = r.left + 'px';
+            panel.style.width = r.width + 'px';
+
+            if (spaceBelow < 240 && spaceAbove > spaceBelow) {
+                panel.style.top = 'auto';
+                panel.style.bottom = (window.innerHeight - r.top + 6) + 'px';
+                panel.style.maxHeight = Math.min(360, spaceAbove) + 'px';
+            } else {
+                panel.style.bottom = 'auto';
+                panel.style.top = (r.bottom + 6) + 'px';
+                panel.style.maxHeight = Math.min(360, Math.max(180, spaceBelow)) + 'px';
+            }
+        }
+
+        function setActive(i, scroll) {
+            if (i < 0 || i >= items.length) return;
+            items.forEach(it => it.el.classList.remove('active'));
+            activeIdx = i;
+            items[i].el.classList.add('active');
+            if (scroll) items[i].el.scrollIntoView({ block: 'nearest' });
+        }
+
+        function isOpen() { return wrap.classList.contains('open'); }
+
+        function open() {
+            if (isOpen() || sel.disabled) return;
+            document.querySelectorAll('.sv-dd.open, .sv-dd-panel.open').forEach(d => d.classList.remove('open'));
+            wrap.classList.add('open');
+            panel.classList.add('open');
+            btn.setAttribute('aria-expanded', 'true');
+            positionPanel();
+            const cur = items.findIndex(i => i.opt === sel.options[sel.selectedIndex]);
+            setActive(cur >= 0 ? cur : 0, true);
+        }
+
+        function close() {
+            wrap.classList.remove('open');
+            panel.classList.remove('open');
+            btn.setAttribute('aria-expanded', 'false');
+        }
+
+        function choose(opt) {
+            sel.value = opt.value;
+            sel.dispatchEvent(new Event('change', { bubbles: true }));
+            close();
+            btn.focus();
+        }
+
+        function move(step) {
+            if (!items.length) return;
+            let i = activeIdx;
+            for (let n = 0; n < items.length; n++) {
+                i = (i + step + items.length) % items.length;
+                if (!items[i].opt.disabled) break;
+            }
+            setActive(i, true);
+        }
+
+        btn.addEventListener('click', () => (isOpen() ? close() : open()));
+        btn.addEventListener('keydown', e => {
+            if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { e.preventDefault(); if (!isOpen()) open(); else move(e.key === 'ArrowDown' ? 1 : -1); }
+            else if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); if (!isOpen()) open(); else if (items[activeIdx]) choose(items[activeIdx].opt); }
+            else if (e.key === 'Escape') { close(); }
+            else if (e.key === 'Tab') { close(); }
+        });
+
+        window.addEventListener('scroll', e => { if (isOpen() && !panel.contains(e.target)) positionPanel(); }, true);
+        window.addEventListener('resize', () => { if (isOpen()) positionPanel(); });
+        document.addEventListener('click', e => { if (!wrap.contains(e.target) && !panel.contains(e.target)) close(); });
+
+        Object.defineProperty(sel, 'value', {
+            configurable: true,
+            get() { return nativeValue.get.call(this); },
+            set(v) { nativeValue.set.call(this, v); refreshLabel(); }
+        });
+        sel.addEventListener('change', refreshLabel);
+        new MutationObserver(build).observe(sel, { childList: true, subtree: true, characterData: true });
+
+        build();
+    }
+
+    function init() {
+        if (!document.getElementById('svDropdownStyle')) {
+            const st = document.createElement('style');
+            st.id = 'svDropdownStyle';
+            st.textContent = CSS;
+            document.head.appendChild(st);
+        }
+        document.querySelectorAll('select').forEach(enhance);
+    }
+
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+    else init();
+})();
