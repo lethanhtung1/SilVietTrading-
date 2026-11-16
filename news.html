@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="vi" class="scroll-smooth">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tin tức - SilViet Global Trade</title>
+<meta name="description" content="Tin tức và thông tin mới nhất từ SilViet.">
+<link rel="icon" type="image/x-icon" href="./favicon.ico">
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = { darkMode: 'class', theme: { extend: {
+  colors: { brand: { navy:'#0f172a', blue:'#0b5fa5', blueDark:'#084a85', blueLight:'#5aa9e6', gold:'#f59e0b' } },
+  fontFamily: { sans: ['Be Vietnam Pro','sans-serif'] } } } }
+</script>
+<script>
+if (localStorage.getItem('theme') === 'dark') document.documentElement.classList.add('dark');
+</script>
+<script src="https://unpkg.com/lucide@latest"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="./supabase-config.js"></script>
+<style>
+body{font-family:'Be Vietnam Pro',sans-serif}
+.rv{opacity:0;transform:translateY(28px);transition:opacity .7s ease,transform .7s ease}
+.rv.in{opacity:1;transform:none}
+.d1{transition-delay:.1s}.d2{transition-delay:.2s}.d3{transition-delay:.3s}.d4{transition-delay:.4s}
+@keyframes flow{to{stroke-dashoffset:-24}}
+@keyframes pulse{0%,100%{r:34}50%{r:40}}
+@keyframes mq{to{transform:translateX(-50%)}}
+.flow{stroke-dasharray:6 6;animation:flow 1.2s linear infinite}
+.mq{animation:mq 28s linear infinite}
+.gtxt{background:linear-gradient(90deg,#5aa9e6,#f59e0b);-webkit-background-clip:text;background-clip:text;color:transparent}
+@media(prefers-reduced-motion:reduce){.rv{opacity:1;transform:none}.flow,.mq{animation:none}}
+</style>
+</head>
+<body class="bg-slate-50 dark:bg-slate-950 text-slate-700 dark:text-slate-300 transition-colors duration-300">
+
+<!-- HEADER -->
+<header class="sticky top-0 z-50 bg-white/85 dark:bg-slate-900/85 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 shadow-xl">
+  <div class="container mx-auto px-4 lg:px-8 h-20 flex items-center justify-between">
+    <a href="index.html" class="flex items-center gap-3">
+      <img src="./silviet-logo.webp" alt="SilViet Logo" class="w-10 h-10 object-contain">
+      <span class="flex flex-col leading-tight"><span class="text-xl font-bold text-slate-900 dark:text-white">SilViet</span><span class="text-xs text-slate-500 dark:text-slate-400">Global B2B Trade &amp; Sourcing</span></span>
+    </a>
+    <nav class="hidden lg:flex items-center space-x-8 text-sm font-medium text-slate-600 dark:text-slate-300">
+      <a href="index.html#categories" class="hover:text-brand-blue transition-colors py-1" data-vi="Sản Phẩm Chủ Lực" data-en="Core Products">Sản Phẩm Chủ Lực</a>
+      <a href="index.html#services" class="hover:text-brand-blue transition-colors py-1" data-vi="Dịch Vụ OEM/ODM" data-en="OEM/ODM Services">Dịch Vụ OEM/ODM</a>
+      <a href="index.html#rfq-form" class="hover:text-brand-blue transition-colors py-1" data-vi="Liên Hệ RFQ" data-en="Inquire RFQ">Liên Hệ RFQ</a>
+      <a href="about.html" class="hover:text-brand-blue transition-colors py-1" data-vi="Giới Thiệu" data-en="About Us">Giới Thiệu</a>
+      <a href="news.html" class="text-brand-blue font-bold py-1" data-vi="Tin Tức" data-en="News">Tin Tức</a>
+    </nav>
+    <div class="flex items-center gap-3">
+      <button onclick="toggleLang()" class="flex items-center gap-1.5 bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-xs px-2.5 py-1 rounded-full text-slate-800 dark:text-white border border-slate-300 dark:border-slate-700">
+        <i data-lucide="languages" class="w-3.5 h-3.5 text-brand-blueLight"></i><span id="langLabel" class="font-bold">VI / EN</span>
+      </button>
+      <button onclick="toggleTheme()" class="bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-xs px-2.5 py-1 rounded-full border border-slate-300 dark:border-slate-700">
+        <span class="dark:hidden text-amber-500 font-bold">☀️</span><span class="hidden dark:inline text-sky-400 font-bold">🌙</span>
+      </button>
+      <a href="index.html#rfq-form" class="hidden sm:flex bg-brand-blue hover:brightness-110 text-white px-5 py-2.5 rounded-xl font-bold text-sm shadow-lg shadow-brand-blue/20 items-center gap-2">
+        <i data-lucide="file-text" class="w-4 h-4"></i><span data-vi="Gửi Yêu Cầu Báo Giá (RFQ)" data-en="Request a Quote (RFQ)">Gửi Yêu Cầu Báo Giá (RFQ)</span>
+      </a>
+      <button onclick="document.getElementById('mobileMenu').classList.toggle('hidden')" class="lg:hidden p-2 rounded-lg text-slate-700 dark:text-slate-300"><i data-lucide="menu" class="w-6 h-6"></i></button>
+    </div>
+  </div>
+  <div id="mobileMenu" class="hidden lg:hidden border-t border-slate-200 dark:border-slate-800 px-4 py-3 space-y-1 text-slate-700 dark:text-slate-300 font-medium">
+    <a href="index.html#categories" class="block py-2" data-vi="Sản Phẩm Chủ Lực" data-en="Core Products">Sản Phẩm Chủ Lực</a>
+    <a href="index.html#services" class="block py-2" data-vi="Dịch Vụ OEM/ODM" data-en="OEM/ODM Services">Dịch Vụ OEM/ODM</a>
+    <a href="index.html#rfq-form" class="block py-2" data-vi="Liên Hệ RFQ" data-en="Inquire RFQ">Liên Hệ RFQ</a>
+    <a href="about.html" class="block py-2" data-vi="Giới Thiệu" data-en="About Us">Giới Thiệu</a>
+    <a href="news.html" class="block py-2 text-brand-blue font-bold" data-vi="Tin Tức" data-en="News">Tin Tức</a>
+  </div>
+</header>
+<main class="container mx-auto px-4 lg:px-8 py-12 lg:py-16 max-w-6xl min-h-[60vh]">
+  <div id="view"></div>
+</main>
+<footer class="bg-slate-900 dark:bg-slate-950 text-slate-400 text-sm py-14 border-t border-slate-200 dark:border-slate-800/80 relative overflow-hidden mt-auto transition-colors duration-300">
+    <div class="container mx-auto px-4 lg:px-8 relative z-10">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-10 pb-12 border-b border-slate-800/80">
+            <div class="lg:col-span-4 space-y-4">
+                <a href="index.html" class="inline-flex items-center gap-3">
+                    <img src="./silviet-logo.webp" loading="lazy" alt="SilViet Logo" class="w-10 h-10 object-contain">
+                    <span class="text-2xl font-black tracking-tight text-white">SilViet</span>
+                </a>
+                <p class="text-sky-400 font-semibold" data-vi="Tốt Hơn Mỗi Ngày" data-en="Better Every Day">Tốt Hơn Mỗi Ngày</p>
+                <div class="space-y-2 text-slate-300">
+                    <p><b class="text-white" data-vi="Địa điểm" data-en="Location">Địa điểm</b>: <span data-vi="193 Nguyễn Xí, Phường Bình Thạnh" data-en="193 Nguyễn Xí, Bình Thạnh Ward">193 Nguyễn Xí, Phường Bình Thạnh</span></p>
+                    <p><b class="text-white" data-vi="Email" data-en="Email">Email</b>: <a href="mailto:info@silviet.com" class="hover:text-white">info@silviet.com</a></p>
+                    <p><b class="text-white" data-vi="Điện thoại" data-en="Phone">Điện thoại</b>: <a href="tel:+84938969238" class="hover:text-white">+84 938 969 238</a></p>
+                </div>
+            </div>
+            <div class="lg:col-span-2 space-y-3">
+                <h5 class="font-bold text-white uppercase tracking-wider text-xs border-l-2 border-amber-400 pl-2.5" data-vi="Công Ty" data-en="Company">Công Ty</h5>
+                <ul class="space-y-2.5 pt-1"><li><a href="about.html" class="hover:text-white transition" data-vi="Về SilViet" data-en="About SilViet">Về SilViet</a></li><li><a href="index.html#categories" class="hover:text-white transition" data-vi="Sản Phẩm Chủ Lực" data-en="Core Products">Sản Phẩm Chủ Lực</a></li><li><a href="index.html#services" class="hover:text-white transition" data-vi="Dịch Vụ OEM/ODM" data-en="OEM/ODM Services">Dịch Vụ OEM/ODM</a></li><li><a href="index.html#rfq-form" class="hover:text-white transition" data-vi="Liên Hệ RFQ" data-en="Inquire RFQ">Liên Hệ RFQ</a></li><li class="pt-1"><a href="https://silviet.com" target="_blank" rel="noopener" class="text-amber-400/90 hover:text-amber-300 font-semibold">SilViet Group Site ↗</a></li></ul>
+            </div>
+            <div class="lg:col-span-3 space-y-3">
+                <h5 class="font-bold text-white uppercase tracking-wider text-xs border-l-2 border-amber-400 pl-2.5" data-vi="Sản Phẩm & Giải Pháp" data-en="Products & Solutions">Sản Phẩm & Giải Pháp</h5>
+                <ul class="space-y-2.5 pt-1"><li><a href="index.html#categories" class="hover:text-white transition" data-vi="Thương mại Nguyên liệu Công nghiệp" data-en="Industrial Raw Material Trading">Thương mại Nguyên liệu Công nghiệp</a></li><li><a href="index.html#categories" class="hover:text-white transition" data-vi="Dịch vụ Xuất khẩu" data-en="Export Services">Dịch vụ Xuất khẩu</a></li><li><a href="index.html#categories" class="hover:text-white transition" data-vi="Giải pháp Logistics" data-en="Logistics Solutions">Giải pháp Logistics</a></li></ul>
+            </div>
+            <div class="lg:col-span-3 space-y-3">
+                <h5 class="font-bold text-white uppercase tracking-wider text-xs border-l-2 border-amber-400 pl-2.5" data-vi="Thị Trường" data-en="Markets">Thị Trường</h5>
+                <ul class="space-y-2.5 pt-1"><li><a href="#" class="hover:text-white transition" data-vi="Thị trường Việt Nam" data-en="Vietnam Market">Thị trường Việt Nam</a></li><li><a href="#" class="hover:text-white transition" data-vi="Đông Nam Á" data-en="Southeast Asia">Đông Nam Á</a></li><li><a href="#" class="hover:text-white transition" data-vi="Xuất khẩu Toàn cầu" data-en="Global Export">Xuất khẩu Toàn cầu</a></li><li><a href="index.html#rfq-form" class="hover:text-white transition" data-vi="Cơ hội Hợp tác" data-en="Partnership Opportunities">Cơ hội Hợp tác</a></li></ul>
+            </div>
+        </div>
+        <div class="pt-6 flex flex-col sm:flex-row justify-between items-center text-slate-500 text-[11px] gap-3">
+            <p>© 2026 SilViet Global Trade &amp; B2B Sourcing Connector. All rights reserved.</p>
+            <div class="flex items-center space-x-6">
+                <a href="#" class="hover:text-amber-400 transition">Privacy Policy</a>
+                <span class="text-slate-800">•</span>
+                <a href="#" class="hover:text-amber-400 transition">Export Terms</a>
+                <span class="text-slate-800">•</span>
+                <a href="#" class="hover:text-amber-400 transition">OEM Specs Guide</a>
+            </div>
+        </div>
+    </div>
+</footer>
+<script>
+let lang = localStorage.getItem('lang') || 'vi';
+let posts = null, cat = '', article = undefined;
+const id = new URLSearchParams(location.search).get('id');
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const safeUrl = u => /^https?:\/\//i.test(u || '') ? u : '';
+const T = (vi, en) => lang === 'en' ? en : vi;
+const pick = (p, f) => (lang === 'en' && p[f + '_en']) || p[f + '_vi'] || '';
+const fmt = d => new Date(d).toLocaleDateString(lang === 'en' ? 'en-GB' : 'vi-VN');
+
+function body(text) {
+  return esc(text).split(/\n{2,}/).map(b => b.startsWith('## ')
+    ? '<h2 class="text-2xl font-bold text-slate-900 dark:text-white mt-8 mb-3">' + b.slice(3) + '</h2>'
+    : '<p class="mb-5">' + b.replace(/\n/g, '<br>') + '</p>').join('');
+}
+
+const WRAP_JS = "(function(){function H(){parent.postMessage({sv:'h',h:document.documentElement.scrollHeight},'*')}function L(l){document.documentElement.lang=l;document.querySelectorAll('[data-lang]').forEach(function(e){e.style.display=e.getAttribute('data-lang')===l?'':'none'});H()}var S=document.createElement('style');S.textContent='html,body{height:auto!important;min-height:0!important}.min-h-screen,.h-screen{height:auto!important;min-height:0!important}body{align-items:flex-start!important}';(document.head||document.documentElement).appendChild(S);L(LANG0);addEventListener('load',H);if(window.ResizeObserver)new ResizeObserver(H).observe(document.documentElement)})();";
+const wrap = (h, l) => '<base target="_blank">' + h + '<scr' + 'ipt>var LANG0="' + l + '";' + WRAP_JS + '</scr' + 'ipt>';
+const isHtml = s => /<[a-z!][\s\S]*>/i.test(s || '');
+window.addEventListener('message', e => {
+  const f = document.getElementById('artFrame');
+  if (f && e.source === f.contentWindow && e.data && e.data.sv === 'h') f.style.height = (e.data.h + 4) + 'px';
+});
+function content(a) {
+  const c = pick(a, 'content') || pick(a, 'summary');
+  return isHtml(c)
+    ? '<iframe id="artFrame" sandbox="allow-scripts allow-popups allow-popups-to-escape-sandbox" class="w-full rounded-2xl bg-white border border-slate-200 dark:border-slate-800" style="height:600px" srcdoc="' + esc(wrap(c, lang)) + '"></iframe>'
+    : '<div class="leading-relaxed text-base">' + body(c) + '</div>';
+}
+function fitImg(i){var r=i.naturalWidth/i.naturalHeight,ok=r>1.4&&r<1.85;i.classList.toggle('object-cover',ok);i.classList.toggle('object-contain',!ok);}
+function card(p) {
+  const cover = safeUrl(p.cover_url);
+  return '<a href="news.html?id=' + encodeURIComponent(p.id) + '" class="group rounded-2xl overflow-hidden bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-brand-blue hover:-translate-y-1 transition flex flex-col">'
+    + (cover ? '<div class="aspect-[16/10] w-full overflow-hidden bg-white dark:bg-slate-800"><img src="' + esc(cover) + '" alt="" loading="lazy" onload="fitImg(this)" class="w-full h-full object-contain"></div>' : '<div class="aspect-[16/10] bg-gradient-to-br from-brand-blue to-brand-navy flex items-center justify-center text-white/30 text-5xl font-extrabold">SV</div>')
+    + '<div class="p-5 flex flex-col gap-2 flex-1"><div class="flex items-center gap-2 text-xs"><span class="text-brand-blue font-bold uppercase">' + esc(p.category || '') + '</span><span class="text-slate-400">' + fmt(p.created_at) + '</span></div>'
+    + '<h3 class="font-bold text-slate-900 dark:text-white leading-snug group-hover:text-brand-blue">' + esc(pick(p, 'title')) + '</h3>'
+    + '<p class="text-sm text-slate-600 dark:text-slate-400 line-clamp-3">' + esc(pick(p, 'summary')) + '</p></div></a>';
+}
+function render() {
+  const v = document.getElementById('view');
+  if (id) {
+    if (article === undefined) { v.innerHTML = '<p class="text-center py-20">...</p>'; return; }
+    if (!article) { v.innerHTML = '<p class="text-center py-20">' + T('Không tìm thấy bài viết.', 'Article not found.') + '</p><p class="text-center"><a href="news.html" class="text-brand-blue font-bold">← ' + T('Về trang tin tức', 'Back to news') + '</a></p>'; return; }
+    const a = article, cover = safeUrl(a.cover_url);
+    document.title = pick(a, 'title') + ' - SilViet';
+    v.innerHTML = '<article class="max-w-4xl mx-auto"><a href="news.html" class="text-brand-blue font-bold text-sm">← ' + T('Tất cả tin tức', 'All news') + '</a>'
+      + '<div class="flex items-center gap-3 text-xs mt-6 mb-3"><span class="text-brand-blue font-bold uppercase">' + esc(a.category || '') + '</span><span class="text-slate-400">' + fmt(a.created_at) + '</span></div>'
+      + '<h1 class="text-3xl lg:text-4xl font-extrabold text-slate-900 dark:text-white leading-tight mb-6">' + esc(pick(a, 'title')) + '</h1>'
+      + (cover ? '<img src="' + esc(cover) + '" alt="" class="w-full h-auto max-h-[32rem] object-contain rounded-2xl mb-8 bg-white dark:bg-slate-800">' : '')
+      + content(a) + '</article>';
+    return;
+  }
+  document.title = T('Tin tức - SilViet Global Trade', 'News - SilViet Global Trade');
+  if (posts === null) { v.innerHTML = '<p class="text-center py-20">...</p>'; return; }
+  const cats = [...new Set(posts.map(p => p.category).filter(Boolean))];
+  const list = cat ? posts.filter(p => p.category === cat) : posts;
+  const chip = (c, label) => '<button data-c="' + esc(c) + '" class="chip px-4 py-1.5 rounded-full text-sm font-semibold border ' + (cat === c ? 'bg-brand-blue text-white border-brand-blue' : 'border-slate-300 dark:border-slate-700 hover:border-brand-blue') + '">' + esc(label) + '</button>';
+  v.innerHTML = '<p class="text-brand-blue font-bold uppercase tracking-widest text-xs mb-2">' + T('Tin tức & Thông tin', 'News & Insights') + '</p>'
+    + '<h1 class="text-3xl lg:text-5xl font-extrabold text-slate-900 dark:text-white mb-8">' + T('Tin tức mới nhất', 'Latest news') + '</h1>'
+    + (cats.length ? '<div class="flex flex-wrap gap-2 mb-8">' + chip('', T('Tất cả', 'All')) + cats.map(c => chip(c, c)).join('') + '</div>' : '')
+    + (list.length ? '<div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">' + list.map(card).join('') + '</div>' : '<p class="text-center py-16">' + T('Chưa có tin tức nào.', 'No news yet.') + '</p>');
+  v.querySelectorAll('.chip').forEach(b => b.onclick = () => { cat = b.dataset.c; render(); });
+}
+async function load() {
+  const c = window.dbClient;
+  if (!c || typeof c.from !== 'function') { posts = []; article = null; render(); return; }
+  if (id) {
+    const r = await c.from('news_posts').select('*').eq('id', id).eq('published', true).or('publish_at.is.null,publish_at.lte.' + new Date().toISOString()).maybeSingle();
+    article = r.error ? null : r.data;
+  } else {
+    const r = await c.from('news_posts').select('id,title_vi,title_en,summary_vi,summary_en,cover_url,category,created_at').eq('published', true).or('publish_at.is.null,publish_at.lte.' + new Date().toISOString()).order('created_at', { ascending: false });
+    posts = r.error ? [] : r.data;
+  }
+  render();
+}
+function applyLang() {
+  document.documentElement.lang = lang;
+  document.querySelectorAll('[data-vi]').forEach(el => { el.textContent = el.dataset[lang]; });
+  document.getElementById('langLabel').textContent = lang === 'vi' ? 'VI / EN' : 'EN / VI';
+  render();
+}
+function toggleLang() { lang = lang === 'vi' ? 'en' : 'vi'; try { localStorage.setItem('lang', lang); } catch (e) {} applyLang(); lucide.createIcons(); }
+function toggleTheme() {
+  const dark = document.documentElement.classList.toggle('dark');
+  try { localStorage.setItem('theme', dark ? 'dark' : 'light'); } catch (e) {}
+}
+applyLang(); lucide.createIcons(); load();
+</script>
+</body>
+</html>

@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Admin - SilViet News</title>
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>tailwind.config={theme:{extend:{colors:{brand:{navy:'#0f172a',blue:'#0b5fa5',blueDark:'#084a85'}},fontFamily:{sans:['Be Vietnam Pro','sans-serif']}}}}</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/supabase-config.js"></script>
+<style>body{font-family:'Be Vietnam Pro',sans-serif}.btn{display:inline-flex;align-items:center;gap:.35rem;font-size:.78rem;font-weight:700;padding:.42rem .8rem;border-radius:.6rem;border:1px solid #cbd5e1;background:#fff;color:#334155;white-space:nowrap}.btn:hover{background:#f1f5f9}.btn-blue{color:#0b5fa5;border-color:#bfdbfe;background:#eff6ff}.btn-blue:hover{background:#dbeafe}.btn-red{color:#dc2626;border-color:#fecaca;background:#fef2f2}.btn-red:hover{background:#fee2e2}.pill{display:inline-block;padding:.45rem .95rem;border:1px solid #cbd5e1;border-radius:999px;font-size:.85rem;font-weight:600;background:#fff;cursor:pointer;color:#475569}input:checked+.pill{background:#0b5fa5;color:#fff;border-color:#0b5fa5}.sec{margin-top:1.5rem;padding-top:1.25rem;border-top:1px solid #f1f5f9}.inp{width:100%;border:1px solid #cbd5e1;border-radius:.75rem;padding:.6rem .9rem;font-size:.9rem;background:#fff}.inp:focus{outline:2px solid #0b5fa5;border-color:transparent}.listbox{max-height:60vh;overflow-y:auto;overscroll-behavior:contain}@media(min-width:1024px){.listbox{max-height:calc(100vh - 14.5rem)}}.chip{font-size:.75rem;font-weight:700;padding:.25rem .65rem;border-radius:999px;border:1px solid #e2e8f0;background:#fff;color:#64748b}.chip:hover{background:#f1f5f9}.chip.on{background:#0f172a;color:#fff;border-color:#0f172a}.row{cursor:pointer;border-left:3px solid transparent}.row:hover{background:#f8fafc}.row.active{background:#eff6ff;border-left-color:#0b5fa5}label.l{display:block;font-size:.75rem;font-weight:700;color:#475569;margin-bottom:.25rem}</style>
+</head>
+<body class="bg-slate-100 text-slate-700">
+
+<!-- LOGIN -->
+<div id="loginBox" class="hidden min-h-screen flex items-center justify-center px-4">
+  <div class="bg-white rounded-2xl shadow-xl p-8 w-full max-w-sm">
+    <img src="/silviet-logo.webp" alt="SilViet" class="w-12 h-12 object-contain mb-4">
+    <h1 class="text-xl font-extrabold text-slate-900 mb-1">SilViet Admin</h1>
+    <p class="text-sm mb-6">Đăng nhập để quản lý tin tức</p>
+    <div class="space-y-3">
+      <div><label class="l">Email</label><input id="email" type="email" class="inp" autocomplete="username"></div>
+      <div><label class="l">Mật khẩu</label><input id="pass" type="password" class="inp" autocomplete="current-password"></div>
+      <p id="loginErr" class="text-sm text-red-600 hidden"></p>
+      <button id="loginBtn" class="w-full bg-brand-blue hover:bg-brand-blueDark text-white font-bold py-2.5 rounded-xl">Đăng nhập</button>
+    </div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app" class="hidden">
+  <header class="bg-brand-navy text-white">
+    <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
+      <div class="flex items-center gap-3"><img src="/silviet-logo.webp" class="w-8 h-8 object-contain" alt=""><b>SilViet Admin · Tin tức</b></div>
+      <div class="flex items-center gap-4 text-sm"><a href="/news.html" target="_blank" class="hover:underline">Xem trang tin tức ↗</a><button id="logoutBtn" class="bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded-lg">Đăng xuất</button></div>
+    </div>
+  </header>
+
+  <main class="max-w-6xl mx-auto px-4 py-8 grid lg:grid-cols-5 gap-8">
+    <!-- Danh sách -->
+    <section class="lg:col-span-2 lg:sticky lg:top-4 lg:self-start">
+      <div class="flex items-center justify-between mb-3"><h2 class="font-extrabold text-slate-900 text-lg">Bài viết <span id="count" class="text-sm font-semibold text-slate-400"></span></h2><button id="newBtn" class="bg-brand-blue hover:bg-brand-blueDark text-white text-sm font-bold px-4 py-2 rounded-xl">+ Bài mới</button></div>
+      <div class="bg-white rounded-2xl shadow-sm overflow-hidden">
+        <div class="p-3 border-b border-slate-100 space-y-2">
+          <input id="q" type="search" class="inp" placeholder="Tìm theo tiêu đề..." autocomplete="off">
+          <div id="filters" class="flex flex-wrap gap-1.5">
+            <button type="button" class="chip on" data-f="all">Tất cả</button>
+            <button type="button" class="chip" data-f="pub">Đã đăng</button>
+            <button type="button" class="chip" data-f="sched">Hẹn giờ</button>
+            <button type="button" class="chip" data-f="draft">Nháp</button>
+          </div>
+        </div>
+        <div id="list" class="listbox divide-y divide-slate-100"></div>
+        <div id="pager" class="hidden flex items-center justify-between gap-2 px-3 py-2.5 border-t border-slate-100 bg-slate-50">
+          <button type="button" id="prevPg" class="btn">‹ Trước</button>
+          <span id="pgInfo" class="text-xs font-semibold text-slate-500"></span>
+          <button type="button" id="nextPg" class="btn">Sau ›</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Form -->
+    <section class="lg:col-span-3 bg-white rounded-2xl shadow p-6">
+      <h2 id="formTitle" class="font-extrabold text-slate-900 text-lg mb-4">Bài mới</h2>
+      <input type="hidden" id="postId">
+      <div class="grid sm:grid-cols-2 gap-4">
+        <div><label class="l">Tiêu đề (Tiếng Việt) *</label><input id="title_vi" class="inp"></div>
+        <div><label class="l">Title (English)</label><input id="title_en" class="inp"></div>
+        <div><label class="l">Tóm tắt (Tiếng Việt)</label><textarea id="summary_vi" rows="2" class="inp"></textarea></div>
+        <div><label class="l">Summary (English)</label><textarea id="summary_en" rows="2" class="inp"></textarea></div>
+        <div><label class="l">Danh mục</label><input id="category" list="cats" class="inp" placeholder="VD: Tin công ty"><datalist id="cats"><option value="Tin công ty"><option value="Thị trường"><option value="Xuất khẩu"><option value="Logistics"></datalist></div>
+        <div>
+          <label class="l">Ảnh bìa (dán link hoặc tải lên)</label>
+          <div class="flex items-center gap-2">
+            <input id="cover_url" class="inp" placeholder="https://...">
+            <button type="button" id="upCoverBtn" class="btn btn-blue">⬆ Tải lên</button>
+            <img id="coverPrev" class="hidden h-10 w-14 rounded-lg object-cover border border-slate-200 shrink-0" alt="">
+          </div>
+          <input type="file" id="coverFile" accept="image/*" class="hidden">
+        </div>
+      </div>
+
+      <div class="sec">
+        <div class="flex items-center justify-between gap-3 mb-2">
+          <b class="text-slate-900 text-sm">Nội dung bài viết (HTML) *</b>
+          <span id="info_vi" class="text-xs text-slate-400">Chưa có nội dung</span>
+        </div>
+        <div class="flex flex-wrap items-center gap-2">
+          <button type="button" class="upHtml btn btn-blue" data-t="vi">📄 Tải HTML + ảnh</button>
+          <button type="button" class="prev btn" data-t="vi">👁 Xem thử</button>
+          <button type="button" class="clr btn btn-red" data-t="vi">Xóa</button>
+          <button type="button" id="upImgBtn" class="btn ml-auto">🖼 Tải ảnh lấy link</button>
+          <input type="file" id="imgFile" accept="image/*" class="hidden">
+        </div>
+        <p class="text-xs mt-2 text-slate-400">Chọn file HTML <b>cùng các ảnh trong bài</b> (giữ Ctrl/Shift để chọn nhiều file) — ảnh sẽ tự tải lên và thay link. Bài song ngữ: 1 file có <code>data-lang="vi"</code> và <code>data-lang="en"</code>.</p>
+        <details class="mt-3">
+          <summary class="text-xs font-bold text-slate-600 cursor-pointer">Nâng cao: xem / sửa HTML trực tiếp</summary>
+          <textarea id="content_vi" rows="8" class="inp font-mono text-xs mt-2"></textarea>
+        </details>
+        <!-- Giữ ẩn để bài cũ có bản English riêng không bị mất dữ liệu khi lưu -->
+        <textarea id="content_en" class="hidden"></textarea><span id="info_en" class="hidden"></span>
+        <input type="file" id="htmlFile" accept=".html,.htm,text/html,image/*" multiple class="hidden">
+      </div>
+
+      <div class="sec">
+        <label class="l">Trạng thái xuất bản *</label>
+        <div class="flex flex-wrap items-center gap-2">
+          <label><input type="radio" name="st" value="draft" class="sr-only" checked><span class="pill">📝 Bản nháp</span></label>
+          <label><input type="radio" name="st" value="now" class="sr-only"><span class="pill">🌐 Đăng ngay</span></label>
+          <label><input type="radio" name="st" value="sched" class="sr-only"><span class="pill">🕒 Hẹn giờ</span></label>
+          <input type="datetime-local" id="publish_at" class="inp hidden" style="width:auto">
+        </div>
+      </div>
+
+      <div class="flex flex-wrap items-center gap-3 mt-6 pt-5 border-t border-slate-100">
+        <button id="saveBtn" class="bg-brand-blue hover:bg-brand-blueDark text-white font-bold px-6 py-2.5 rounded-xl">Lưu bài</button>
+        <button id="resetBtn" class="border border-slate-300 font-semibold px-5 py-2.5 rounded-xl hover:bg-slate-50">Làm mới form</button>
+        <p id="msg" class="text-sm hidden"></p>
+      </div>
+    </section>
+  </main>
+</div>
+
+<div id="pv" class="hidden fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4">
+  <div class="bg-white rounded-2xl w-full max-w-4xl h-[85vh] flex flex-col overflow-hidden">
+    <div class="flex items-center gap-3 px-5 py-3 border-b text-sm font-bold"><span>Xem thử:</span><button data-l="vi" class="pvl text-brand-blue">VI</button><button data-l="en" class="pvl text-brand-blue">EN</button><button id="pvClose" class="ml-auto text-red-600">Đóng ✕</button></div>
+    <iframe id="pvFrame" sandbox="allow-scripts" class="flex-1 w-full bg-white"></iframe>
+  </div>
+</div>
+<p id="noDb" class="hidden p-10 text-center text-red-600 font-semibold">Chưa kết nối được Supabase (thiếu supabase-config.js / window.dbClient).</p>
+
+<script>
+const db = window.dbClient;
+const $ = id => document.getElementById(id);
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const F = ['title_vi','title_en','summary_vi','summary_en','content_vi','content_en','category','cover_url'];
+const WRAP_JS = "(function(){function L(l){document.documentElement.lang=l;document.querySelectorAll('[data-lang]').forEach(function(e){e.style.display=e.getAttribute('data-lang')===l?'':'none'})}L(LANG0)})();";
+const wrap = (h, l) => '<base target="_blank">' + h + '<scr' + 'ipt>var LANG0="' + l + '";' + WRAP_JS + '</scr' + 'ipt>';
+let posts = [], upTarget = 'vi';
+
+let toastTimer;
+function toast(t, ok) {
+  let el = $('toast');
+  if (!el) { el = document.createElement('div'); el.id = 'toast'; document.body.appendChild(el); }
+  el.className = 'fixed top-5 left-1/2 -translate-x-1/2 z-[100] max-w-[90vw] px-6 py-3.5 rounded-2xl shadow-2xl text-white font-bold text-sm pointer-events-none transition-opacity duration-300 ' + (ok ? 'bg-green-600' : 'bg-red-600');
+  el.textContent = (ok ? '✅ ' : '⚠️ ') + t;
+  el.style.opacity = '1';
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { el.style.opacity = '0'; }, 4500);
+}
+function fail(t) { say(t, false); toast(t, false); }
+function say(t, ok) { const m = $('msg'); m.textContent = t; m.className = 'text-sm ' + (ok ? 'text-green-600' : 'text-red-600'); }
+function info(t) { const v = $('content_' + t).value; $('info_' + t).textContent = v ? 'Đã có nội dung (' + Math.round(v.length / 1024) + ' KB)' : 'Chưa có nội dung'; }
+function st() { return document.querySelector('input[name=st]:checked').value; }
+function setSt(v) { document.querySelector('input[name=st][value=' + v + ']').checked = true; $('publish_at').classList.toggle('hidden', v !== 'sched'); }
+function localDT(iso) { const d = new Date(iso); return new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 16); }
+function showPrev() {
+  const u = $('cover_url').value.trim(), img = $('coverPrev');
+  if (/^https?:\/\//i.test(u)) { img.src = u; img.classList.remove('hidden'); } else img.classList.add('hidden');
+}
+function resetForm() {
+  $('postId').value = ''; $('formTitle').textContent = 'Bài mới';
+  F.forEach(f => $(f).value = ''); $('publish_at').value = ''; setSt('draft'); info('vi'); info('en'); showPrev(); $('msg').className = 'hidden'; renderList();
+}
+async function edit(id) {
+  const r = await db.from('news_posts').select('*').eq('id', id).single();
+  if (r.error) return fail('Không tải được bài: ' + r.error.message);
+  const p = r.data;
+  $('postId').value = p.id; $('formTitle').textContent = 'Sửa bài';
+  F.forEach(f => $(f).value = p[f] || ''); info('vi'); info('en'); showPrev();
+  if (!p.published) { setSt('draft'); $('publish_at').value = ''; }
+  else if (p.publish_at && new Date(p.publish_at) > new Date()) { setSt('sched'); $('publish_at').value = localDT(p.publish_at); }
+  else { setSt('now'); $('publish_at').value = ''; }
+  $('msg').className = 'hidden'; renderList(); window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+function badge(p) {
+  if (!p.published) return ['Nháp', 'bg-amber-100 text-amber-700'];
+  if (p.publish_at && new Date(p.publish_at) > new Date()) return ['Hẹn ' + new Date(p.publish_at).toLocaleString('vi-VN', { dateStyle: 'short', timeStyle: 'short' }), 'bg-blue-100 text-blue-700'];
+  return ['Đã đăng', 'bg-green-100 text-green-700'];
+}
+let fStatus = 'all', fQuery = '', page = 1;
+const PAGE_SIZE = 10;
+function statusOf(p) {
+  if (!p.published) return 'draft';
+  return p.publish_at && new Date(p.publish_at) > new Date() ? 'sched' : 'pub';
+}
+function renderList() {
+  const q = fQuery.trim().toLowerCase(), cur = $('postId').value;
+  const rows = posts.filter(p => (fStatus === 'all' || statusOf(p) === fStatus) && (!q || (p.title_vi || '').toLowerCase().includes(q) || (p.category || '').toLowerCase().includes(q)));
+  $('count').textContent = '(' + (rows.length === posts.length ? posts.length : rows.length + '/' + posts.length) + ')';
+  const pages = Math.max(1, Math.ceil(rows.length / PAGE_SIZE)); if (page > pages) page = pages; if (page < 1) page = 1;
+  $('pager').classList.toggle('hidden', pages < 2); $('pgInfo').textContent = 'Trang ' + page + '/' + pages;
+  $('prevPg').disabled = page <= 1; $('nextPg').disabled = page >= pages;
+  $('prevPg').classList.toggle('opacity-40', page <= 1); $('nextPg').classList.toggle('opacity-40', page >= pages);
+  if (!rows.length) { $('list').innerHTML = '<p class="text-sm p-5 text-center">' + (posts.length ? 'Không có bài phù hợp.' : 'Chưa có bài nào. Bấm "+ Bài mới" để bắt đầu.') + '</p>'; return; }
+  $('list').innerHTML = rows.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE).map(p => { const b = badge(p);
+    return '<div class="row px-4 py-3' + (p.id === cur ? ' active' : '') + '" data-id="' + p.id + '">'
+    + '<div class="flex items-start justify-between gap-3"><b class="text-slate-900 text-sm leading-snug line-clamp-2">' + esc(p.title_vi) + '</b><span class="shrink-0 text-[11px] font-bold px-2 py-0.5 rounded-full ' + b[1] + '">' + esc(b[0]) + '</span></div>'
+    + '<div class="flex items-center justify-between gap-3 mt-1">'
+    + '<span class="text-xs text-slate-400 truncate">' + esc(p.category || '—') + ' · ' + new Date(p.created_at).toLocaleDateString('vi-VN') + '</span>'
+    + '<span class="shrink-0 flex gap-3 text-xs font-semibold"><button data-a="edit" data-id="' + p.id + '" class="text-brand-blue">Sửa</button>'
+    + (p.published ? '<a href="/news.html?id=' + p.id + '" target="_blank" class="text-slate-600">Xem ↗</a>' : '')
+    + '<button data-a="del" data-id="' + p.id + '" class="text-red-600">Xóa</button></span></div></div>'; }).join('');
+}
+async function load() {
+  const r = await db.from('news_posts').select('id,title_vi,category,created_at,published,publish_at').order('created_at', { ascending: false });
+  if (r.error) { say('Lỗi tải dữ liệu: ' + r.error.message, false); return; }
+  posts = r.data; renderList();
+}
+async function upImage(file) {
+  if (!file.type.startsWith('image/')) throw new Error('Chỉ nhận file ảnh.');
+  if (file.size > 5 * 1024 * 1024) throw new Error('Ảnh tối đa 5MB.');
+  const ext = (file.name.split('.').pop() || 'jpg').toLowerCase().replace(/[^a-z0-9]/g, '') || 'jpg';
+  const path = Date.now() + '-' + Math.random().toString(36).slice(2, 8) + '.' + ext;
+  const r = await db.storage.from('news-images').upload(path, file, { contentType: file.type, cacheControl: '31536000' });
+  if (r.error) throw r.error;
+  return db.storage.from('news-images').getPublicUrl(path).data.publicUrl;
+}
+$('upCoverBtn').onclick = () => $('coverFile').click();
+$('coverFile').onchange = async e => {
+  const f = e.target.files[0]; e.target.value = ''; if (!f) return;
+  try { say('Đang tải ảnh...', true); $('cover_url').value = await upImage(f); showPrev(); say('Đã tải ảnh bìa lên.', true); } catch (err) { say('Tải ảnh thất bại: ' + err.message, false); }
+};
+$('upImgBtn').onclick = () => $('imgFile').click();
+$('imgFile').onchange = async e => {
+  const f = e.target.files[0]; e.target.value = ''; if (!f) return;
+  try { say('Đang tải ảnh...', true); const u = await upImage(f);
+    try { await navigator.clipboard.writeText(u); say('Đã tải ảnh và copy link: ' + u, true); } catch (x) { say('Link ảnh: ' + u, true); }
+  } catch (err) { say('Tải ảnh thất bại: ' + err.message, false); }
+};
+document.querySelectorAll('.upHtml').forEach(b => b.onclick = () => { upTarget = b.dataset.t; $('htmlFile').click(); });
+// ---- Tự quét HTML: tải ảnh lên Supabase và thay link ----
+const IMG_EXT = /\.(png|jpe?g|gif|webp|svg|avif|bmp)$/i;
+const REF_RE = /(src\s*=\s*)(["'])(.*?)\2|url\(\s*(["']?)(.*?)\4\s*\)/gi;
+function dataUrlToFile(ref) {
+  const m = /^data:(image\/[a-z0-9.+-]+);base64,(.*)$/is.exec(ref.trim());
+  if (!m) return null;
+  const bin = atob(m[2].replace(/\s/g, '')), arr = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
+  const ext = m[1].split('/')[1].split('+')[0].replace('jpeg', 'jpg');
+  return new File([arr], 'img.' + ext, { type: m[1] });
+}
+async function processHtml(html, imgs, onProgress) {
+  const cache = {}, missing = new Set(), failed = [];
+  const todo = [];
+  for (const m of html.matchAll(REF_RE)) {
+    const ref = (m[3] !== undefined ? m[3] : m[5] || '').trim();
+    if (!ref || ref in cache || todo.some(t => t.ref === ref)) continue;
+    if (/^data:image\//i.test(ref)) { todo.push({ ref, kind: 'data', label: 'ảnh nhúng' }); continue; }
+    if (/^(https?:)?\/\//i.test(ref) || /^(blob|javascript|mailto|tel):/i.test(ref) || ref[0] === '#') continue;
+    const path = ref.split(/[?#]/)[0];
+    if (!IMG_EXT.test(path)) continue;
+    let base = path.split(/[\\/]/).pop();
+    try { base = decodeURIComponent(base); } catch (e) {}
+    const file = imgs[base.toLowerCase()];
+    if (file) todo.push({ ref, kind: 'file', file, label: base });
+    else if (ref[0] !== '/' || ref.startsWith('//')) missing.add(base);   // đường dẫn tuyệt đối "/x.png" coi như ảnh của web, bỏ qua
+  }
+  let n = 0;
+  for (const t of todo) {
+    onProgress && onProgress(++n, todo.length);
+    try {
+      const f = t.kind === 'data' ? dataUrlToFile(t.ref) : t.file;
+      if (!f) continue;
+      cache[t.ref] = await upImage(f);
+    } catch (err) { failed.push(t.label + ' (' + err.message + ')'); }
+  }
+  const out = html.replace(REF_RE, (all, p1, p2, p3, p4, p5) => {
+    if (p3 !== undefined) { const u = cache[p3.trim()]; return u ? p1 + p2 + u + p2 : all; }
+    const u = cache[(p5 || '').trim()]; return u ? 'url(' + (p4 || '') + u + (p4 || '') + ')' : all;
+  });
+  return { html: out, uploaded: Object.keys(cache).length, missing: [...missing], failed };
+}
+$('htmlFile').onchange = async e => {
+  const files = Array.from(e.target.files); e.target.value = ''; if (!files.length) return;
+  const htmlF = files.find(f => /\.html?$/i.test(f.name) || f.type === 'text/html');
+  if (!htmlF) return say('Hãy chọn 1 file HTML (và kèm các ảnh trong bài nếu có).', false);
+  if (htmlF.size > 15 * 1024 * 1024) return say('File HTML tối đa 15MB.', false);
+  const imgs = {}; files.filter(f => f.type.startsWith('image/')).forEach(f => imgs[f.name.toLowerCase()] = f);
+  try {
+    say('Đang đọc file HTML...', true);
+    const r = await processHtml(await htmlF.text(), imgs, (i, n) => say('Đang tải ảnh ' + i + '/' + n + ' lên...', true));
+    if (r.html.length > 3 * 1024 * 1024) return say('Nội dung sau khi xử lý vẫn quá 3MB.', false);
+    $('content_' + upTarget).value = r.html; info(upTarget);
+    let t = 'Đã nạp ' + htmlF.name + (r.uploaded ? ' · tự tải ' + r.uploaded + ' ảnh lên và thay link' : '');
+    if (r.missing.length) t += ' · ⚠ Thiếu ảnh: ' + r.missing.join(', ') + ' (hãy chọn kèm các ảnh này khi tải file)';
+    if (r.failed.length) t += ' · ⚠ Lỗi tải: ' + r.failed.join('; ');
+    say(t, !r.missing.length && !r.failed.length);
+  } catch (err) { say('Lỗi xử lý file: ' + err.message, false); }
+};
+document.querySelectorAll('.clr').forEach(b => b.onclick = () => { $('content_' + b.dataset.t).value = ''; info(b.dataset.t); });
+['vi', 'en'].forEach(t => $('content_' + t).addEventListener('input', () => info(t)));
+let pvHtml = '';
+function pv(l) { $('pvFrame').srcdoc = wrap((l === 'en' && $('content_en').value) || pvHtml, l); }
+document.querySelectorAll('.prev').forEach(b => b.onclick = () => {
+  pvHtml = $('content_' + b.dataset.t).value || $('content_vi').value || $('content_en').value;
+  if (!pvHtml) return say('Chưa có nội dung để xem thử.', false);
+  $('pv').classList.remove('hidden'); pv(b.dataset.t);
+});
+document.querySelectorAll('.pvl').forEach(b => b.onclick = () => pv(b.dataset.l));
+$('pvClose').onclick = () => { $('pv').classList.add('hidden'); $('pvFrame').srcdoc = ''; };
+document.querySelectorAll('input[name=st]').forEach(r => r.onchange = () => setSt(st()));
+
+$('list').addEventListener('click', async e => {
+  const b = e.target.closest('button[data-a]');
+  if (!b) { const row = e.target.closest('.row'); if (row && !e.target.closest('a')) edit(row.dataset.id); return; }
+  const id = b.dataset.id, p = posts.find(x => x.id === id);
+  if (b.dataset.a === 'edit') return edit(id);
+  if (b.dataset.a === 'del' && confirm('Xóa bài "' + p.title_vi + '"? Không thể hoàn tác.')) {
+    const r = await db.from('news_posts').delete().eq('id', id);
+    if (r.error) fail(r.error.message); else toast('Đã xóa bài.', true);
+    if ($('postId').value === id) resetForm();
+    load();
+  }
+});
+$('q').addEventListener('input', e => { fQuery = e.target.value; page = 1; renderList(); });
+const goPage = d => { page += d; renderList(); $('list').scrollTop = 0; };
+$('prevPg').onclick = () => goPage(-1); $('nextPg').onclick = () => goPage(1);
+$('filters').addEventListener('click', e => {
+  const c = e.target.closest('.chip'); if (!c) return;
+  fStatus = c.dataset.f; page = 1;
+  document.querySelectorAll('#filters .chip').forEach(x => x.classList.toggle('on', x === c));
+  renderList();
+});
+$('saveBtn').onclick = async () => {
+  if (!$('title_vi').value.trim()) return fail('Cần nhập tiêu đề tiếng Việt.');
+  if (!$('content_vi').value.trim() && !$('content_en').value.trim()) return fail('Cần có nội dung (tải file HTML).');
+  const url = $('cover_url').value.trim();
+  if (url && !/^https?:\/\//i.test(url)) return fail('Link ảnh bìa phải bắt đầu bằng http:// hoặc https://');
+  const s = st(), row = { updated_at: new Date().toISOString(), published: s !== 'draft', publish_at: null };
+  if (s === 'sched') {
+    const v = $('publish_at').value; if (!v) return fail('Hãy chọn ngày giờ đăng.');
+    row.publish_at = new Date(v).toISOString();
+  }
+  F.forEach(f => row[f] = $(f).value.trim() || null);
+  const id = $('postId').value, btn = $('saveBtn');
+  btn.disabled = true; btn.textContent = 'Đang lưu...'; btn.classList.add('opacity-60');
+  try {
+    const r = id ? await db.from('news_posts').update(row).eq('id', id).select().single() : await db.from('news_posts').insert(row).select().single();
+    if (r.error) return fail('Lưu thất bại: ' + r.error.message);
+    $('postId').value = r.data.id; $('formTitle').textContent = 'Sửa bài';
+    const t = s === 'draft' ? 'Đã lưu bản nháp.' : s === 'now' ? 'Đăng bài thành công!' : 'Đã hẹn giờ đăng lúc ' + new Date(row.publish_at).toLocaleString('vi-VN') + '.';
+    say(t, true); toast(t, true); load();
+  } catch (err) {
+    fail('Lưu thất bại: ' + err.message);
+  } finally {
+    btn.disabled = false; btn.textContent = 'Lưu bài'; btn.classList.remove('opacity-60');
+  }
+};
+$('newBtn').onclick = $('resetBtn').onclick = resetForm;
+$('cover_url').addEventListener('input', showPrev);
+
+async function gate() {
+  const s = await db.auth.getSession();
+  const ok = !!(s.data && s.data.session);
+  $('loginBox').classList.toggle('hidden', ok); $('app').classList.toggle('hidden', !ok);
+  if (ok) load();
+}
+$('loginBtn').onclick = async () => {
+  const r = await db.auth.signInWithPassword({ email: $('email').value.trim(), password: $('pass').value });
+  if (r.error) { $('loginErr').textContent = 'Sai email hoặc mật khẩu.'; $('loginErr').classList.remove('hidden'); return; }
+  gate();
+};
+$('pass').addEventListener('keydown', e => { if (e.key === 'Enter') $('loginBtn').click(); });
+$('logoutBtn').onclick = async () => { await db.auth.signOut(); gate(); };
+if (!db || !db.auth) $('noDb').classList.remove('hidden'); else gate();
+</script>
+</body>
+</html>

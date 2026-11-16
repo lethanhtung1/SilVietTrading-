@@ -2,6 +2,7 @@
 let globalProducts = [];
 let currentLang = 'vi';
 let categoryPages = {}; 
+let activeCategorySlug = null; // nhớ tab đang mở khi đổi ngôn ngữ / chuyển trang
 const ITEMS_PER_PAGE = 6;
 
 // Giá trị đặc biệt của option "Sản phẩm khác" (khách tự nhập)
@@ -94,7 +95,30 @@ const i18nData = {
         foot_desc: "Đơn vị kết nối thương mại & xuất khẩu B2B thuộc SilViet Group. Chuyên dòng thực phẩm khô, nước dừa đóng lon & giày dép xuất khẩu sang EU, US, Middle East.",
         foot_products: "Dòng Sản Phẩm Chủ Lực",
         foot_links: "Điều Hướng",
-        foot_contact: "Trụ Sở Sourcing Hub"
+        foot_contact: "Trụ Sở Sourcing Hub",
+        f_tagline: "Tốt Hơn Mỗi Ngày",
+        f_loc: "Địa điểm",
+        f_addr: "193 Nguyễn Xí, Phường Bình Thạnh",
+        f_email: "Email",
+        f_phone: "Điện thoại",
+        f_company: "Công Ty",
+        f_c1: "Về SilViet",
+        f_c2: "Nền tảng của chúng tôi",
+        f_c3: "Tin tức & Thông tin",
+        f_c4: "Liên hệ",
+        f_prod: "Sản Phẩm & Giải Pháp",
+        f_p1: "Thương mại Nguyên liệu Công nghiệp",
+        f_p3: "Dịch vụ Xuất khẩu",
+        f_p4: "Giải pháp Logistics",
+        f_mkt: "Thị Trường",
+        f_m1: "Thị trường Việt Nam",
+        f_m2: "Đông Nam Á",
+        f_m3: "Xuất khẩu Toàn cầu",
+        f_m4: "Cơ hội Hợp tác",
+        nav_news: "Tin Tức",
+        news_badge: "Tin Tức & Thông Tin",
+        news_title: "Tin Tức Mới Nhất",
+        news_all: "Xem tất cả tin tức"
     },
     en: {
         top_network: "SilViet Sourcing Hub: Ho Chi Minh • Binh Duong",
@@ -170,7 +194,30 @@ const i18nData = {
         foot_desc: "B2B trade and export connector under SilViet Group. Specializing in dry foods, canned coconut water, and export footwear to the EU, US, and Middle East.",
         foot_products: "Core Product Lines",
         foot_links: "Quick Links",
-        foot_contact: "Sourcing Hub Headquarters"
+        foot_contact: "Sourcing Hub Headquarters",
+        f_tagline: "Better Every Day",
+        f_loc: "Location",
+        f_addr: "193 Nguyễn Xí, Bình Thạnh Ward",
+        f_email: "Email",
+        f_phone: "Phone",
+        f_company: "Company",
+        f_c1: "About SilViet",
+        f_c2: "Our Platform",
+        f_c3: "News & Insights",
+        f_c4: "Contact",
+        f_prod: "Products & Solutions",
+        f_p1: "Industrial Raw Material Trading",
+        f_p3: "Export Services",
+        f_p4: "Logistics Solutions",
+        f_mkt: "Markets",
+        f_m1: "Vietnam Market",
+        f_m2: "Southeast Asia",
+        f_m3: "Global Export",
+        f_m4: "Partnership Opportunities",
+        nav_news: "News",
+        news_badge: "News & Insights",
+        news_title: "Latest News",
+        news_all: "View all news"
     }
 };
 
@@ -235,6 +282,7 @@ function toggleMobileMenu() {
 }
 
 function switchCategoryTab(targetSlug) {
+    activeCategorySlug = targetSlug;
     document.querySelectorAll('.cat-content').forEach(c => c.classList.add('hidden'));
     document.querySelectorAll('.cat-tab-btn').forEach(b => {
         b.classList.remove('bg-brand-blue', 'text-white', 'font-semibold');
@@ -329,8 +377,13 @@ async function loadDynamicCategories() {
         tabsContainer.innerHTML = '';
         contentsContainer.innerHTML = '';
 
+        // Giữ nguyên tab đang mở; nếu chưa có hoặc slug không còn tồn tại thì dùng tab đầu
+        if (!categories.some(c => c.slug === activeCategorySlug)) {
+            activeCategorySlug = categories[0].slug;
+        }
+
         categories.forEach((cat, index) => {
-            const isFirst = index === 0;
+            const isFirst = cat.slug === activeCategorySlug;
             const categoryDisplayName = isEn ? (cat.name_en || cat.name) : cat.name;
 
             if (!categoryPages[cat.slug]) {
@@ -419,6 +472,7 @@ async function loadDynamicCategories() {
 
 function changeCategoryPage(catSlug, pageNum) {
     categoryPages[catSlug] = pageNum;
+    activeCategorySlug = catSlug;
     loadDynamicCategories();
 }
 
@@ -510,9 +564,9 @@ function renderProductCard(prod) {
     };
 
     return `
-        <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl overflow-hidden hover:border-brand-blue transition flex flex-col justify-between">
+        <div class="pop-card"><div class="pop-body h-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl overflow-hidden flex flex-col justify-between">
             <div>
-                <div onclick="openProductDetailModal('${prod.id}')" class="relative h-56 overflow-hidden bg-white flex items-center justify-center cursor-pointer group">
+                <div onclick="openProductDetailModal('${prod.id}')" class="pop-stage relative h-56 overflow-hidden bg-white flex items-center justify-center cursor-pointer group">
                     <img src="${img}" alt="${productName}" loading="lazy" class="w-full h-full object-contain p-3" style="filter:brightness(1.05);" onerror="this.src='https://placehold.co/600x400/0f172a/ffffff?text=SilViet+Product'">
                     <span class="absolute top-3 right-3 px-2.5 py-1 rounded-md bg-white/90 text-brand-blue text-xs font-medium shadow-sm">
                         ${prod.tag || 'SOURCING'}
@@ -537,6 +591,8 @@ function renderProductCard(prod) {
                     ${labels.btnQuote}
                 </button>
             </div>
+        </div>
+        <div class="pop-float" aria-hidden="true"><img src="${img}" alt="" loading="lazy" onerror="this.src='https://placehold.co/600x400/0f172a/ffffff?text=SilViet+Product'"></div>
         </div>
     `;
 }
