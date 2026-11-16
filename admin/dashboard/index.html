@@ -11,7 +11,7 @@
 <script>tailwind.config={theme:{extend:{colors:{brand:{navy:'#0f172a',blue:'#0b5fa5',blueDark:'#084a85'}},fontFamily:{sans:['Be Vietnam Pro','sans-serif']}}}}</script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="/supabase-config.js"></script>
-<style>body{font-family:'Be Vietnam Pro',sans-serif}.btn{display:inline-flex;align-items:center;gap:.35rem;font-size:.78rem;font-weight:700;padding:.42rem .8rem;border-radius:.6rem;border:1px solid #cbd5e1;background:#fff;color:#334155;white-space:nowrap}.btn:hover{background:#f1f5f9}.btn-blue{color:#0b5fa5;border-color:#bfdbfe;background:#eff6ff}.btn-blue:hover{background:#dbeafe}.btn-red{color:#dc2626;border-color:#fecaca;background:#fef2f2}.btn-red:hover{background:#fee2e2}.pill{display:inline-block;padding:.45rem .95rem;border:1px solid #cbd5e1;border-radius:999px;font-size:.85rem;font-weight:600;background:#fff;cursor:pointer;color:#475569}input:checked+.pill{background:#0b5fa5;color:#fff;border-color:#0b5fa5}.sec{margin-top:1.5rem;padding-top:1.25rem;border-top:1px solid #f1f5f9}.inp{width:100%;border:1px solid #cbd5e1;border-radius:.75rem;padding:.6rem .9rem;font-size:.9rem;background:#fff}.inp:focus{outline:2px solid #0b5fa5;border-color:transparent}.listbox{max-height:60vh;overflow-y:auto;overscroll-behavior:contain}@media(min-width:1024px){.listbox{max-height:calc(100vh - 14.5rem)}}.chip{font-size:.75rem;font-weight:700;padding:.25rem .65rem;border-radius:999px;border:1px solid #e2e8f0;background:#fff;color:#64748b}.chip:hover{background:#f1f5f9}.chip.on{background:#0f172a;color:#fff;border-color:#0f172a}.row{cursor:pointer;border-left:3px solid transparent}.row:hover{background:#f8fafc}.row.active{background:#eff6ff;border-left-color:#0b5fa5}label.l{display:block;font-size:.75rem;font-weight:700;color:#475569;margin-bottom:.25rem}</style>
+<style>body{font-family:'Be Vietnam Pro',sans-serif}.btn{display:inline-flex;align-items:center;gap:.35rem;font-size:.78rem;font-weight:700;padding:.42rem .8rem;border-radius:.6rem;border:1px solid #cbd5e1;background:#fff;color:#334155;white-space:nowrap}.btn:hover{background:#f1f5f9}.btn-blue{color:#0b5fa5;border-color:#bfdbfe;background:#eff6ff}.btn-blue:hover{background:#dbeafe}.btn-red{color:#dc2626;border-color:#fecaca;background:#fef2f2}.btn-red:hover{background:#fee2e2}.pill{display:inline-block;padding:.45rem .95rem;border:1px solid #cbd5e1;border-radius:999px;font-size:.85rem;font-weight:600;background:#fff;cursor:pointer;color:#475569}input:checked+.pill{background:#0b5fa5;color:#fff;border-color:#0b5fa5}.sec{margin-top:1.5rem;padding-top:1.25rem;border-top:1px solid #f1f5f9}.inp{width:100%;border:1px solid #cbd5e1;border-radius:.75rem;padding:.6rem .9rem;font-size:.9rem;background:#fff}.inp:focus{outline:2px solid #0b5fa5;border-color:transparent}.listbox{max-height:60vh;overflow-y:auto;overscroll-behavior:contain}@media(min-width:1024px){.listbox{max-height:calc(100vh - 14.5rem)}}.chip{font-size:.75rem;font-weight:700;padding:.25rem .65rem;border-radius:999px;border:1px solid #e2e8f0;background:#fff;color:#64748b}.chip:hover{background:#f1f5f9}.chip.on{background:#0f172a;color:#fff;border-color:#0f172a}.row{cursor:pointer;border-left:3px solid transparent}.row:hover{background:#f8fafc}.row.active{background:#eff6ff;border-left-color:#0b5fa5}label.l{display:block;font-size:.75rem;font-weight:700;color:#475569;margin-bottom:.25rem}.card2{border:1px solid #e2e8f0;border-radius:1rem;padding:1rem 1.1rem;background:#f8fafc}.card2.w{background:#fff}.sh{display:flex;align-items:center;gap:.5rem;font-size:.7rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#64748b;margin-bottom:.85rem}.tag{font-size:.65rem;font-weight:800;padding:.1rem .45rem;border-radius:.4rem;background:#0b5fa5;color:#fff;letter-spacing:.03em}label.l small{font-weight:500;color:#94a3b8}</style>
 </head>
 <body class="bg-slate-100 text-slate-700">
 
@@ -33,15 +33,15 @@
 <!-- APP -->
 <div id="app" class="hidden">
   <header class="bg-brand-navy text-white">
-    <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
+    <div class="max-w-[1800px] mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
       <div class="flex items-center gap-3"><img src="/silviet-logo.webp" class="w-8 h-8 object-contain" alt=""><b>SilViet Admin · Tin tức</b></div>
       <div class="flex items-center gap-4 text-sm"><a href="/news.html" target="_blank" class="hover:underline">Xem trang tin tức ↗</a><button id="logoutBtn" class="bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded-lg">Đăng xuất</button></div>
     </div>
   </header>
 
-  <main class="max-w-6xl mx-auto px-4 py-8 grid lg:grid-cols-5 gap-8">
+  <main class="max-w-[1800px] mx-auto px-4 sm:px-6 lg:px-8 py-8 grid lg:grid-cols-[minmax(340px,440px)_minmax(0,1fr)] gap-6 lg:gap-8">
     <!-- Danh sách -->
-    <section class="lg:col-span-2 lg:sticky lg:top-4 lg:self-start">
+    <section class="lg:sticky lg:top-4 lg:self-start">
       <div class="flex items-center justify-between mb-3"><h2 class="font-extrabold text-slate-900 text-lg">Bài viết <span id="count" class="text-sm font-semibold text-slate-400"></span></h2><button id="newBtn" class="bg-brand-blue hover:bg-brand-blueDark text-white text-sm font-bold px-4 py-2 rounded-xl">+ Bài mới</button></div>
       <div class="bg-white rounded-2xl shadow-sm overflow-hidden">
         <div class="p-3 border-b border-slate-100 space-y-2">
@@ -63,59 +63,87 @@
     </section>
 
     <!-- Form -->
-    <section class="lg:col-span-3 bg-white rounded-2xl shadow p-6">
+    <section class="min-w-0 bg-white rounded-2xl shadow p-6 lg:p-8">
       <h2 id="formTitle" class="font-extrabold text-slate-900 text-lg mb-4">Bài mới</h2>
       <input type="hidden" id="postId">
-      <div class="grid sm:grid-cols-2 gap-4">
-        <div><label class="l">Tiêu đề (Tiếng Việt) *</label><input id="title_vi" class="inp"></div>
-        <div><label class="l">Title (English)</label><input id="title_en" class="inp"></div>
-        <div><label class="l">Tóm tắt (Tiếng Việt)</label><textarea id="summary_vi" rows="2" class="inp"></textarea></div>
-        <div><label class="l">Summary (English)</label><textarea id="summary_en" rows="2" class="inp"></textarea></div>
-        <div><label class="l">Danh mục</label><input id="category" list="cats" class="inp" placeholder="VD: Tin công ty"><datalist id="cats"><option value="Tin công ty"><option value="Thị trường"><option value="Xuất khẩu"><option value="Logistics"></datalist></div>
-        <div>
-          <label class="l">Ảnh bìa (dán link hoặc tải lên)</label>
-          <div class="flex items-center gap-2">
-            <input id="cover_url" class="inp" placeholder="https://...">
-            <button type="button" id="upCoverBtn" class="btn btn-blue">⬆ Tải lên</button>
-            <img id="coverPrev" class="hidden h-10 w-14 rounded-lg object-cover border border-slate-200 shrink-0" alt="">
+      <div class="space-y-4">
+
+        <!-- Thông tin theo ngôn ngữ -->
+        <div class="grid md:grid-cols-2 gap-4">
+          <div class="card2 space-y-3">
+            <div class="sh"><span class="tag">VI</span> Tiếng Việt</div>
+            <div><label class="l">Tiêu đề *</label><input id="title_vi" class="inp"></div>
+            <div><label class="l">Tóm tắt</label><textarea id="summary_vi" rows="2" class="inp"></textarea></div>
+            <div>
+              <label class="l">Ảnh bìa</label>
+              <div class="flex items-center gap-3">
+                <div class="relative w-20 h-14 shrink-0 rounded-lg border border-dashed border-slate-300 bg-white grid place-items-center text-slate-300 text-lg overflow-hidden">🖼<img id="coverPrev" class="hidden absolute inset-0 w-full h-full object-cover bg-white" alt=""></div>
+                <div class="flex-1 min-w-0 flex gap-2"><input id="cover_url" class="inp" placeholder="Dán link ảnh..."><button type="button" id="upCoverBtn" class="btn btn-blue">⬆ Tải lên</button></div>
+              </div>
+              <input type="file" id="coverFile" accept="image/*" class="hidden">
+            </div>
           </div>
-          <input type="file" id="coverFile" accept="image/*" class="hidden">
+
+          <div class="card2 space-y-3">
+            <div class="sh"><span class="tag">EN</span> English</div>
+            <div><label class="l">Title</label><input id="title_en" class="inp"></div>
+            <div><label class="l">Summary</label><textarea id="summary_en" rows="2" class="inp"></textarea></div>
+            <div>
+              <label class="l">Cover image <small>· để trống = dùng ảnh tiếng Việt</small></label>
+              <div class="flex items-center gap-3">
+                <div class="relative w-20 h-14 shrink-0 rounded-lg border border-dashed border-slate-300 bg-white grid place-items-center text-slate-300 text-lg overflow-hidden">🖼<img id="coverPrevEn" class="hidden absolute inset-0 w-full h-full object-cover bg-white" alt=""></div>
+                <div class="flex-1 min-w-0 flex gap-2"><input id="cover_url_en" class="inp" placeholder="Paste image link..."><button type="button" id="upCoverBtnEn" class="btn btn-blue">⬆ Tải lên</button></div>
+              </div>
+              <input type="file" id="coverFileEn" accept="image/*" class="hidden">
+            </div>
+          </div>
         </div>
+
+        <!-- Nội dung HTML -->
+        <div class="card2 w">
+          <div class="flex items-center justify-between gap-3 mb-3">
+            <div class="sh !mb-0">Nội dung bài viết (HTML) *</div>
+            <span id="info_vi" class="text-xs text-slate-400">Chưa có nội dung</span>
+          </div>
+          <div class="flex flex-wrap items-center gap-2">
+            <button type="button" class="upHtml btn btn-blue" data-t="vi">📄 Tải HTML + ảnh</button>
+            <button type="button" class="prev btn" data-t="vi">👁 Xem thử</button>
+            <button type="button" class="clr btn btn-red" data-t="vi">Xóa</button>
+            <button type="button" id="upImgBtn" class="btn ml-auto">🖼 Tải ảnh lấy link</button>
+            <input type="file" id="imgFile" accept="image/*" class="hidden">
+          </div>
+          <p class="text-xs mt-2 text-slate-400">Chọn file HTML <b>cùng các ảnh trong bài</b> (giữ Ctrl/Shift để chọn nhiều file). Bài song ngữ: 1 file có <code>data-lang="vi"</code> và <code>data-lang="en"</code>.</p>
+          <details class="mt-2">
+            <summary class="text-xs font-bold text-slate-600 cursor-pointer">Nâng cao: xem / sửa HTML trực tiếp</summary>
+            <textarea id="content_vi" rows="8" class="inp font-mono text-xs mt-2"></textarea>
+          </details>
+          <!-- Giữ ẩn để bài cũ có bản English riêng không bị mất dữ liệu khi lưu -->
+          <textarea id="content_en" class="hidden"></textarea><span id="info_en" class="hidden"></span>
+          <input type="file" id="htmlFile" accept=".html,.htm,text/html,image/*" multiple class="hidden">
+        </div>
+
+        <!-- Phân loại & xuất bản -->
+        <div class="card2 w grid md:grid-cols-2 gap-4">
+          <div>
+            <div class="sh">Phân loại</div>
+            <label class="l">Danh mục</label>
+            <input id="category" list="cats" class="inp" placeholder="VD: Tin công ty"><datalist id="cats"><option value="Tin công ty"><option value="Thị trường"><option value="Xuất khẩu"><option value="Logistics"></datalist>
+          </div>
+          <div>
+            <div class="sh">Xuất bản *</div>
+            <div class="flex flex-wrap items-center gap-2">
+              <label><input type="radio" name="st" value="draft" class="sr-only" checked><span class="pill">📝 Nháp</span></label>
+              <label><input type="radio" name="st" value="now" class="sr-only"><span class="pill">🌐 Đăng ngay</span></label>
+              <label><input type="radio" name="st" value="sched" class="sr-only"><span class="pill">🕒 Hẹn giờ</span></label>
+            </div>
+            <input type="datetime-local" id="publish_at" class="inp hidden mt-2">
+          </div>
+        </div>
+
       </div>
 
-      <div class="sec">
-        <div class="flex items-center justify-between gap-3 mb-2">
-          <b class="text-slate-900 text-sm">Nội dung bài viết (HTML) *</b>
-          <span id="info_vi" class="text-xs text-slate-400">Chưa có nội dung</span>
-        </div>
-        <div class="flex flex-wrap items-center gap-2">
-          <button type="button" class="upHtml btn btn-blue" data-t="vi">📄 Tải HTML + ảnh</button>
-          <button type="button" class="prev btn" data-t="vi">👁 Xem thử</button>
-          <button type="button" class="clr btn btn-red" data-t="vi">Xóa</button>
-          <button type="button" id="upImgBtn" class="btn ml-auto">🖼 Tải ảnh lấy link</button>
-          <input type="file" id="imgFile" accept="image/*" class="hidden">
-        </div>
-        <p class="text-xs mt-2 text-slate-400">Chọn file HTML <b>cùng các ảnh trong bài</b> (giữ Ctrl/Shift để chọn nhiều file) — ảnh sẽ tự tải lên và thay link. Bài song ngữ: 1 file có <code>data-lang="vi"</code> và <code>data-lang="en"</code>.</p>
-        <details class="mt-3">
-          <summary class="text-xs font-bold text-slate-600 cursor-pointer">Nâng cao: xem / sửa HTML trực tiếp</summary>
-          <textarea id="content_vi" rows="8" class="inp font-mono text-xs mt-2"></textarea>
-        </details>
-        <!-- Giữ ẩn để bài cũ có bản English riêng không bị mất dữ liệu khi lưu -->
-        <textarea id="content_en" class="hidden"></textarea><span id="info_en" class="hidden"></span>
-        <input type="file" id="htmlFile" accept=".html,.htm,text/html,image/*" multiple class="hidden">
-      </div>
-
-      <div class="sec">
-        <label class="l">Trạng thái xuất bản *</label>
-        <div class="flex flex-wrap items-center gap-2">
-          <label><input type="radio" name="st" value="draft" class="sr-only" checked><span class="pill">📝 Bản nháp</span></label>
-          <label><input type="radio" name="st" value="now" class="sr-only"><span class="pill">🌐 Đăng ngay</span></label>
-          <label><input type="radio" name="st" value="sched" class="sr-only"><span class="pill">🕒 Hẹn giờ</span></label>
-          <input type="datetime-local" id="publish_at" class="inp hidden" style="width:auto">
-        </div>
-      </div>
-
-      <div class="flex flex-wrap items-center gap-3 mt-6 pt-5 border-t border-slate-100">
+      <!-- Thanh lưu cố định -->
+      <div class="sticky bottom-0 -mx-6 -mb-6 lg:-mx-8 lg:-mb-8 mt-5 px-6 lg:px-8 py-3.5 bg-white/95 backdrop-blur border-t border-slate-200 rounded-b-2xl flex flex-wrap items-center gap-3">
         <button id="saveBtn" class="bg-brand-blue hover:bg-brand-blueDark text-white font-bold px-6 py-2.5 rounded-xl">Lưu bài</button>
         <button id="resetBtn" class="border border-slate-300 font-semibold px-5 py-2.5 rounded-xl hover:bg-slate-50">Làm mới form</button>
         <p id="msg" class="text-sm hidden"></p>
@@ -136,7 +164,7 @@
 const db = window.dbClient;
 const $ = id => document.getElementById(id);
 const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const F = ['title_vi','title_en','summary_vi','summary_en','content_vi','content_en','category','cover_url'];
+const F = ['title_vi','title_en','summary_vi','summary_en','content_vi','content_en','category','cover_url','cover_url_en'];
 const WRAP_JS = "(function(){function L(l){document.documentElement.lang=l;document.querySelectorAll('[data-lang]').forEach(function(e){e.style.display=e.getAttribute('data-lang')===l?'':'none'})}L(LANG0)})();";
 const wrap = (h, l) => '<base target="_blank">' + h + '<scr' + 'ipt>var LANG0="' + l + '";' + WRAP_JS + '</scr' + 'ipt>';
 let posts = [], upTarget = 'vi';
@@ -158,8 +186,10 @@ function st() { return document.querySelector('input[name=st]:checked').value; }
 function setSt(v) { document.querySelector('input[name=st][value=' + v + ']').checked = true; $('publish_at').classList.toggle('hidden', v !== 'sched'); }
 function localDT(iso) { const d = new Date(iso); return new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 16); }
 function showPrev() {
-  const u = $('cover_url').value.trim(), img = $('coverPrev');
-  if (/^https?:\/\//i.test(u)) { img.src = u; img.classList.remove('hidden'); } else img.classList.add('hidden');
+  [['cover_url', 'coverPrev'], ['cover_url_en', 'coverPrevEn']].forEach(([i, p]) => {
+    const u = $(i).value.trim(), img = $(p);
+    if (/^https?:\/\//i.test(u)) { img.src = u; img.classList.remove('hidden'); } else img.classList.add('hidden');
+  });
 }
 function resetForm() {
   $('postId').value = ''; $('formTitle').textContent = 'Bài mới';
@@ -223,6 +253,11 @@ $('upCoverBtn').onclick = () => $('coverFile').click();
 $('coverFile').onchange = async e => {
   const f = e.target.files[0]; e.target.value = ''; if (!f) return;
   try { say('Đang tải ảnh...', true); $('cover_url').value = await upImage(f); showPrev(); say('Đã tải ảnh bìa lên.', true); } catch (err) { say('Tải ảnh thất bại: ' + err.message, false); }
+};
+$('upCoverBtnEn').onclick = () => $('coverFileEn').click();
+$('coverFileEn').onchange = async e => {
+  const f = e.target.files[0]; e.target.value = ''; if (!f) return;
+  try { say('Đang tải ảnh...', true); $('cover_url_en').value = await upImage(f); showPrev(); say('Đã tải ảnh bìa tiếng Anh lên.', true); } catch (err) { say('Tải ảnh thất bại: ' + err.message, false); }
 };
 $('upImgBtn').onclick = () => $('imgFile').click();
 $('imgFile').onchange = async e => {
@@ -328,8 +363,10 @@ $('filters').addEventListener('click', e => {
 $('saveBtn').onclick = async () => {
   if (!$('title_vi').value.trim()) return fail('Cần nhập tiêu đề tiếng Việt.');
   if (!$('content_vi').value.trim() && !$('content_en').value.trim()) return fail('Cần có nội dung (tải file HTML).');
-  const url = $('cover_url').value.trim();
-  if (url && !/^https?:\/\//i.test(url)) return fail('Link ảnh bìa phải bắt đầu bằng http:// hoặc https://');
+  for (const i of ['cover_url', 'cover_url_en']) {
+    const url = $(i).value.trim();
+    if (url && !/^https?:\/\//i.test(url)) return fail('Link ảnh bìa phải bắt đầu bằng http:// hoặc https://');
+  }
   const s = st(), row = { updated_at: new Date().toISOString(), published: s !== 'draft', publish_at: null };
   if (s === 'sched') {
     const v = $('publish_at').value; if (!v) return fail('Hãy chọn ngày giờ đăng.');
@@ -352,6 +389,7 @@ $('saveBtn').onclick = async () => {
 };
 $('newBtn').onclick = $('resetBtn').onclick = resetForm;
 $('cover_url').addEventListener('input', showPrev);
+$('cover_url_en').addEventListener('input', showPrev);
 
 async function gate() {
   const s = await db.auth.getSession();

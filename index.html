@@ -617,7 +617,7 @@ header nav{gap:1.75rem}header nav>*+*{margin-left:0!important}
         if (!posts.length) { el.innerHTML = '<p class="col-span-full text-center text-slate-500 py-10">' + (en ? 'No news yet.' : 'Chưa có tin tức nào.') + '</p>'; return; }
         el.innerHTML = posts.map(p => {
             const t = (en && p.title_en) || p.title_vi, s = (en && p.summary_en) || p.summary_vi || '';
-            const cover = safeUrl(p.cover_url);
+            const cover = safeUrl((en && p.cover_url_en) || p.cover_url);
             const d = new Date(p.created_at).toLocaleDateString(en ? 'en-GB' : 'vi-VN');
             return '<a href="news.html?id=' + encodeURIComponent(p.id) + '" class="group rounded-2xl overflow-hidden bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 hover:border-brand-blue hover:-translate-y-1 transition flex flex-col">'
                 + (cover ? '<div class="aspect-[16/10] w-full overflow-hidden bg-white dark:bg-slate-800"><img src="' + esc(cover) + '" alt="" loading="lazy" onload="fitImg(this)" class="w-full h-full object-contain"></div>' : '<div class="aspect-[16/10] bg-gradient-to-br from-brand-blue to-brand-navy flex items-center justify-center text-white/30 text-5xl font-extrabold">SV</div>')
@@ -629,13 +629,16 @@ header nav{gap:1.75rem}header nav>*+*{margin-left:0!important}
     async function load() {
         const c = window.dbClient;
         if (!c || typeof c.from !== 'function') { posts = []; render(); return; }
-        const r = await c.from('news_posts').select('id,title_vi,title_en,summary_vi,summary_en,cover_url,category,created_at').eq('published', true).or('publish_at.is.null,publish_at.lte.' + new Date().toISOString()).order('created_at', { ascending: false }).limit(3);
+        const r = await c.from('news_posts').select('id,title_vi,title_en,summary_vi,summary_en,cover_url,cover_url_en,category,created_at').eq('published', true).or('publish_at.is.null,publish_at.lte.' + new Date().toISOString()).order('created_at', { ascending: false }).limit(3);
         posts = r.error ? [] : r.data; render();
     }
     document.addEventListener('DOMContentLoaded', () => {
         load();
         const o = window.toggleLanguage;
-        if (typeof o === 'function') window.toggleLanguage = function () { o.apply(this, arguments); render(); };
+        if (typeof o === 'function') {
+            window.toggleLanguage = function () { o.apply(this, arguments); try { localStorage.setItem('lang', L()); } catch (e) {} render(); };
+            try { const saved = localStorage.getItem('lang'); if ((saved === 'en' || saved === 'vi') && saved !== L()) window.toggleLanguage(); } catch (e) {}
+        }
     });
 })();
 </script>
