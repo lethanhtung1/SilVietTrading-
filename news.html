@@ -139,8 +139,16 @@ window.addEventListener('message', e => {
 function content(a) {
   const c = pick(a, 'content') || pick(a, 'summary');
   return isHtml(c)
-    ? '<iframe id="artFrame" sandbox="allow-scripts allow-popups allow-popups-to-escape-sandbox" class="w-full rounded-2xl bg-white border border-slate-200 dark:border-slate-800" style="height:600px" srcdoc="' + esc(wrap(c, lang)) + '"></iframe>'
+    ? '<iframe id="artFrame" sandbox="allow-scripts allow-popups allow-popups-to-escape-sandbox" class="w-full rounded-2xl bg-white border border-slate-200 dark:border-slate-800 shadow-xl shadow-slate-900/5" style="height:600px" srcdoc="' + esc(wrap(c, lang)) + '"></iframe>'
     : '<div class="leading-relaxed text-base">' + body(c) + '</div>';
+}
+// Nền trang: 2 quầng màu hai bên (xanh trái, cam phải) + lưới chấm mờ, để hai bên không bị trống
+function bgDecor() {
+  const b = document.body.style;
+  b.backgroundImage = 'radial-gradient(34rem 34rem at 0% 30%, rgba(11,95,165,.14), transparent 70%), radial-gradient(34rem 34rem at 100% 60%, rgba(255,98,0,.12), transparent 70%), radial-gradient(rgba(100,116,139,.20) 1px, transparent 1px)';
+  b.backgroundSize = 'auto, auto, 24px 24px';
+  b.backgroundRepeat = 'no-repeat, no-repeat, repeat';
+  b.backgroundAttachment = 'fixed, fixed, scroll';
 }
 function fitImg(i){var r=i.naturalWidth/i.naturalHeight,ok=r>1.4&&r<1.85;i.classList.toggle('object-cover',ok);i.classList.toggle('object-contain',!ok);}
 function card(p) {
@@ -157,14 +165,16 @@ function render() {
     if (article === undefined) { v.innerHTML = '<p class="text-center py-20">...</p>'; return; }
     if (!article) { v.innerHTML = '<p class="text-center py-20">' + T('Không tìm thấy bài viết.', 'Article not found.') + '</p><p class="text-center"><a href="news.html" class="text-brand-blue font-bold">← ' + T('Về trang tin tức', 'Back to news') + '</a></p>'; return; }
     const a = article, cover = safeUrl(a.cover_url);
+    bgDecor();
     document.title = pick(a, 'title') + ' - SilViet';
     v.innerHTML = '<article class="max-w-4xl mx-auto"><a href="news.html" class="text-brand-blue font-bold text-sm">← ' + T('Tất cả tin tức', 'All news') + '</a>'
       + '<div class="flex items-center gap-3 text-xs mt-6 mb-3"><span class="text-brand-blue font-bold uppercase">' + esc(a.category || '') + '</span><span class="text-slate-400">' + fmt(a.created_at) + '</span></div>'
       + '<h1 class="text-3xl lg:text-4xl font-extrabold text-slate-900 dark:text-white leading-tight mb-6">' + esc(pick(a, 'title')) + '</h1>'
-      + (cover ? '<img src="' + esc(cover) + '" alt="" class="w-full h-auto max-h-[32rem] object-contain rounded-2xl mb-8 bg-white dark:bg-slate-800">' : '')
+      + (cover ? '<img src="' + esc(cover) + '" alt="" class="w-full h-auto max-h-[75vh] object-contain rounded-2xl mb-8">' : '')
       + content(a) + '</article>';
     return;
   }
+  bgDecor();
   document.title = T('Tin tức - SilViet Global Trade', 'News - SilViet Global Trade');
   if (posts === null) { v.innerHTML = '<p class="text-center py-20">...</p>'; return; }
   const cats = [...new Set(posts.map(p => p.category).filter(Boolean))];
