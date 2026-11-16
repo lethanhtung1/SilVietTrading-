@@ -150,6 +150,36 @@ function bgDecor() {
   b.backgroundRepeat = 'no-repeat, no-repeat, repeat';
   b.backgroundAttachment = 'fixed, fixed, scroll';
 }
+// ---- Tìm kiếm theo tên (gần giống, bỏ dấu) + lọc theo ngày ----
+let q = '', dFrom = '', dTo = '';
+const norm = s => String(s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/đ/g, 'd').replace(/[^a-z0-9\s]/g, ' ');
+function lev(a, b) {
+  const m = a.length, n = b.length, d = [];
+  for (let i = 0; i <= m; i++) { d[i] = [i]; }
+  for (let j = 1; j <= n; j++) d[0][j] = j;
+  for (let i = 1; i <= m; i++) for (let j = 1; j <= n; j++)
+    d[i][j] = Math.min(d[i - 1][j] + 1, d[i][j - 1] + 1, d[i - 1][j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
+  return d[m][n];
+}
+function matchTitle(p, qn) {
+  const hay = norm((p.title_vi || '') + ' ' + (p.title_en || ''));
+  const toks = hay.split(/\s+/).filter(Boolean);
+  return qn.split(/\s+/).filter(Boolean).every(w => hay.includes(w) || (w.length >= 4 && toks.some(t => Math.abs(t.length - w.length) <= 1 && lev(w, t) <= 1)));
+}
+const ymd = d => { const x = new Date(d); return x.getFullYear() + '-' + String(x.getMonth() + 1).padStart(2, '0') + '-' + String(x.getDate()).padStart(2, '0'); };
+function filtered() {
+  const qn = norm(q).trim();
+  let a = dFrom, b = dTo; if (a && b && a > b) { const t = a; a = b; b = t; }
+  return posts.filter(p => (!cat || p.category === cat) && (!qn || matchTitle(p, qn)) && (!a || ymd(p.created_at) >= a) && (!b || ymd(p.created_at) <= b));
+}
+function renderGrid() {
+  const g = document.getElementById('newsGrid'), n = document.getElementById('newsCount'), c = document.getElementById('clearF');
+  if (!g) return;
+  const list = filtered();
+  n.textContent = list.length + (lang === 'en' ? (list.length === 1 ? ' article' : ' articles') : ' bài viết');
+  g.innerHTML = list.length ? list.map(card).join('') : '<p class="col-span-full text-center py-16">' + T('Không tìm thấy bài viết phù hợp.', 'No matching articles found.') + '</p>';
+  if (c) c.classList.toggle('hidden', !(q || dFrom || dTo));
+}
 function fitImg(i){var r=i.naturalWidth/i.naturalHeight,ok=r>1.4&&r<1.85;i.classList.toggle('object-cover',ok);i.classList.toggle('object-contain',!ok);}
 function card(p) {
   const cover = safeUrl(p.cover_url);
@@ -178,13 +208,27 @@ function render() {
   document.title = T('Tin tức - SilViet Global Trade', 'News - SilViet Global Trade');
   if (posts === null) { v.innerHTML = '<p class="text-center py-20">...</p>'; return; }
   const cats = [...new Set(posts.map(p => p.category).filter(Boolean))];
-  const list = cat ? posts.filter(p => p.category === cat) : posts;
   const chip = (c, label) => '<button data-c="' + esc(c) + '" class="chip px-4 py-1.5 rounded-full text-sm font-semibold border ' + (cat === c ? 'bg-brand-blue text-white border-brand-blue' : 'border-slate-300 dark:border-slate-700 hover:border-brand-blue') + '">' + esc(label) + '</button>';
+  const inp = 'rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100 px-3 py-2.5 text-sm outline-none focus:border-brand-blue dark:[color-scheme:dark]';
+  const filters = '<div class="flex flex-wrap items-end gap-3 mb-5">'
+    + '<div class="relative flex-1 min-w-[220px]"><svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>'
+    + '<input id="qInput" type="search" value="' + esc(q) + '" placeholder="' + T('Tìm theo tên bài viết...', 'Search by title...') + '" class="' + inp + ' w-full pl-9"></div>'
+    + '<label class="text-xs font-semibold text-slate-500">' + T('Từ ngày', 'From') + '<input id="dFrom" type="date" value="' + esc(dFrom) + '" class="' + inp + ' block mt-1"></label>'
+    + '<label class="text-xs font-semibold text-slate-500">' + T('Đến ngày', 'To') + '<input id="dTo" type="date" value="' + esc(dTo) + '" class="' + inp + ' block mt-1"></label>'
+    + '<button id="clearF" type="button" class="hidden px-4 py-2.5 rounded-xl text-sm font-semibold border border-slate-300 dark:border-slate-700 hover:border-brand-blue">' + T('Xóa lọc', 'Clear') + '</button></div>';
   v.innerHTML = '<p class="text-brand-blue font-bold uppercase tracking-widest text-xs mb-2">' + T('Tin tức & Thông tin', 'News & Insights') + '</p>'
     + '<h1 class="text-3xl lg:text-5xl font-extrabold text-slate-900 dark:text-white mb-8">' + T('Tin tức mới nhất', 'Latest news') + '</h1>'
-    + (cats.length ? '<div class="flex flex-wrap gap-2 mb-8">' + chip('', T('Tất cả', 'All')) + cats.map(c => chip(c, c)).join('') + '</div>' : '')
-    + (list.length ? '<div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">' + list.map(card).join('') + '</div>' : '<p class="text-center py-16">' + T('Chưa có tin tức nào.', 'No news yet.') + '</p>');
+    + (posts.length ? filters : '')
+    + (cats.length ? '<div class="flex flex-wrap gap-2 mb-6">' + chip('', T('Tất cả', 'All')) + cats.map(c => chip(c, c)).join('') + '</div>' : '')
+    + (posts.length ? '<p id="newsCount" class="text-sm text-slate-500 mb-4"></p><div id="newsGrid" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>' : '<p class="text-center py-16">' + T('Chưa có tin tức nào.', 'No news yet.') + '</p>');
   v.querySelectorAll('.chip').forEach(b => b.onclick = () => { cat = b.dataset.c; render(); });
+  if (posts.length) {
+    document.getElementById('qInput').oninput = e => { q = e.target.value; renderGrid(); };
+    document.getElementById('dFrom').onchange = e => { dFrom = e.target.value; renderGrid(); };
+    document.getElementById('dTo').onchange = e => { dTo = e.target.value; renderGrid(); };
+    document.getElementById('clearF').onclick = () => { q = dFrom = dTo = ''; document.getElementById('qInput').value = ''; document.getElementById('dFrom').value = ''; document.getElementById('dTo').value = ''; renderGrid(); };
+    renderGrid();
+  }
 }
 async function load() {
   const c = window.dbClient;
