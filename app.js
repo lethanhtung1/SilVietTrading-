@@ -1000,7 +1000,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (video) video.play().catch(() => {});
         return;
     }
-    setTimeout(() => { finishIntro(); }, 4500);
+    setTimeout(() => { finishIntro(); }, 200);
 });
 
 function finishIntro() {
