@@ -992,9 +992,13 @@ async function handleMainRFQSubmit(event) {
 
 document.addEventListener('DOMContentLoaded', () => {
     const video = document.getElementById("companyIntroVideo");
-    if (video) {
-        video.muted = true; 
-        video.pause();
+    if (video) { video.muted = true; video.pause(); }
+
+    if (sessionStorage.getItem('introSeen')) {   // đã xem rồi -> bỏ qua ngay
+        const intro = document.getElementById("introSplash");
+        if (intro) intro.remove();
+        if (video) video.play().catch(() => {});
+        return;
     }
     setTimeout(() => { finishIntro(); }, 4500);
 });
