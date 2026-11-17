@@ -2,6 +2,7 @@
 let globalProducts = [];
 let currentLang = 'vi';
 let categoryPages = {}; 
+let activeCategorySlug = null; // nhớ tab đang mở khi đổi ngôn ngữ / chuyển trang
 const ITEMS_PER_PAGE = 6;
 
 // Giá trị đặc biệt của option "Sản phẩm khác" (khách tự nhập)
@@ -25,6 +26,7 @@ const i18nData = {
         nav_products: "Sản Phẩm Chủ Lực",
         nav_services: "Dịch Vụ OEM/ODM",
         nav_rfq: "Liên Hệ RFQ",
+        nav_about: "Giới Thiệu",
         btn_rfq: "Gửi Yêu Cầu Báo Giá (RFQ)",
         
         // Video Fullscreen Section
@@ -93,13 +95,37 @@ const i18nData = {
         foot_desc: "Đơn vị kết nối thương mại & xuất khẩu B2B thuộc SilViet Group. Chuyên dòng thực phẩm khô, nước dừa đóng lon & giày dép xuất khẩu sang EU, US, Middle East.",
         foot_products: "Dòng Sản Phẩm Chủ Lực",
         foot_links: "Điều Hướng",
-        foot_contact: "Trụ Sở Sourcing Hub"
+        foot_contact: "Trụ Sở Sourcing Hub",
+        f_tagline: "Tốt Hơn Mỗi Ngày",
+        f_loc: "Địa điểm",
+        f_addr: "193 Nguyễn Xí, Phường Bình Thạnh",
+        f_email: "Email",
+        f_phone: "Điện thoại",
+        f_company: "Công Ty",
+        f_c1: "Về SilViet",
+        f_c2: "Nền tảng của chúng tôi",
+        f_c3: "Tin tức & Thông tin",
+        f_c4: "Liên hệ",
+        f_prod: "Sản Phẩm & Giải Pháp",
+        f_p1: "Thương mại Nguyên liệu Công nghiệp",
+        f_p3: "Dịch vụ Xuất khẩu",
+        f_p4: "Giải pháp Logistics",
+        f_mkt: "Thị Trường",
+        f_m1: "Thị trường Việt Nam",
+        f_m2: "Đông Nam Á",
+        f_m3: "Xuất khẩu Toàn cầu",
+        f_m4: "Cơ hội Hợp tác",
+        nav_news: "Tin Tức",
+        news_badge: "Tin Tức & Thông Tin",
+        news_title: "Tin Tức Mới Nhất",
+        news_all: "Xem tất cả tin tức"
     },
     en: {
         top_network: "SilViet Sourcing Hub: Ho Chi Minh • Binh Duong",
         nav_products: "Core Products",
         nav_services: "OEM/ODM Services",
         nav_rfq: "Inquire RFQ",
+        nav_about: "About Us",
         btn_rfq: "Request a Quote (RFQ)",
 
         // Video Fullscreen Section
@@ -168,9 +194,33 @@ const i18nData = {
         foot_desc: "B2B trade and export connector under SilViet Group. Specializing in dry foods, canned coconut water, and export footwear to the EU, US, and Middle East.",
         foot_products: "Core Product Lines",
         foot_links: "Quick Links",
-        foot_contact: "Sourcing Hub Headquarters"
+        foot_contact: "Sourcing Hub Headquarters",
+        f_tagline: "Better Every Day",
+        f_loc: "Location",
+        f_addr: "193 Nguyễn Xí, Bình Thạnh Ward",
+        f_email: "Email",
+        f_phone: "Phone",
+        f_company: "Company",
+        f_c1: "About SilViet",
+        f_c2: "Our Platform",
+        f_c3: "News & Insights",
+        f_c4: "Contact",
+        f_prod: "Products & Solutions",
+        f_p1: "Industrial Raw Material Trading",
+        f_p3: "Export Services",
+        f_p4: "Logistics Solutions",
+        f_mkt: "Markets",
+        f_m1: "Vietnam Market",
+        f_m2: "Southeast Asia",
+        f_m3: "Global Export",
+        f_m4: "Partnership Opportunities",
+        nav_news: "News",
+        news_badge: "News & Insights",
+        news_title: "Latest News",
+        news_all: "View all news"
     }
 };
+
 function updateStaticTexts(lang) {
     const texts = i18nData[lang];
     if (!texts) return;
@@ -232,6 +282,7 @@ function toggleMobileMenu() {
 }
 
 function switchCategoryTab(targetSlug) {
+    activeCategorySlug = targetSlug;
     document.querySelectorAll('.cat-content').forEach(c => c.classList.add('hidden'));
     document.querySelectorAll('.cat-tab-btn').forEach(b => {
         b.classList.remove('bg-brand-blue', 'text-white', 'font-semibold');
@@ -276,11 +327,9 @@ function requestQuoteFor(productName) {
 
 // ================= 4. SUPABASE DATA & RENDER PRODUCTS =================
 
-// ---- Ảnh sản phẩm: lấy từ Supabase Storage (bucket "Img") ----
 const PRODUCT_IMG_BUCKET = 'Img';
 const PRODUCT_IMG_FALLBACK = 'https://placehold.co/600x400/0f172a/ffffff?text=SilViet+Product';
 
-// image_url trong DB có thể là: link đầy đủ (http...) HOẶC chỉ tên file trong bucket (vd: BanhPho.png)
 function getProductImageUrl(prod) {
     const raw = (prod && prod.image_url ? String(prod.image_url) : '').trim();
     if (!raw) return PRODUCT_IMG_FALLBACK;
@@ -328,8 +377,13 @@ async function loadDynamicCategories() {
         tabsContainer.innerHTML = '';
         contentsContainer.innerHTML = '';
 
+        // Giữ nguyên tab đang mở; nếu chưa có hoặc slug không còn tồn tại thì dùng tab đầu
+        if (!categories.some(c => c.slug === activeCategorySlug)) {
+            activeCategorySlug = categories[0].slug;
+        }
+
         categories.forEach((cat, index) => {
-            const isFirst = index === 0;
+            const isFirst = cat.slug === activeCategorySlug;
             const categoryDisplayName = isEn ? (cat.name_en || cat.name) : cat.name;
 
             if (!categoryPages[cat.slug]) {
@@ -388,7 +442,7 @@ async function loadDynamicCategories() {
 
                     const nextDisabled = currentPage === totalPages;
                     paginationHTML += `
-                        <button type="button" onclick="changeCategoryPage('${cat.slug}', ${currentPage + 1})" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-white text-slate-600 border border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700 transition ${nextDisabled ? 'opacity-40 cursor-not-allowed pointer-events-none' : 'hover:border-brand-blue cursor-pointer'}">
+                        <button type="button" onclick="changeCategoryPage('${cat.slug}', ${currentPage + 1})" class="px-3.5 py-1.5 rounded-lg text-xs font-bold bg-white text-slate-600 border border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700 transition ${nextDisabled ? 'opacity-40 cursor-not-allowed pointer-events-none' : 'hover:border-brand-blue cursor-pointer'}">
                             Next &raquo;
                         </button>
                     `;
@@ -418,6 +472,7 @@ async function loadDynamicCategories() {
 
 function changeCategoryPage(catSlug, pageNum) {
     categoryPages[catSlug] = pageNum;
+    activeCategorySlug = catSlug;
     loadDynamicCategories();
 }
 
@@ -509,9 +564,9 @@ function renderProductCard(prod) {
     };
 
     return `
-        <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl overflow-hidden hover:border-brand-blue transition flex flex-col justify-between">
+        <div class="pop-card"><div class="pop-body h-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl overflow-hidden flex flex-col justify-between">
             <div>
-                <div onclick="openProductDetailModal('${prod.id}')" class="relative h-56 overflow-hidden bg-white flex items-center justify-center cursor-pointer group">
+                <div onclick="openProductDetailModal('${prod.id}')" class="pop-stage relative h-56 overflow-hidden bg-white flex items-center justify-center cursor-pointer group">
                     <img src="${img}" alt="${productName}" loading="lazy" class="w-full h-full object-contain p-3" style="filter:brightness(1.05);" onerror="this.src='https://placehold.co/600x400/0f172a/ffffff?text=SilViet+Product'">
                     <span class="absolute top-3 right-3 px-2.5 py-1 rounded-md bg-white/90 text-brand-blue text-xs font-medium shadow-sm">
                         ${prod.tag || 'SOURCING'}
@@ -537,6 +592,8 @@ function renderProductCard(prod) {
                 </button>
             </div>
         </div>
+        <div class="pop-float" aria-hidden="true"><img src="${img}" alt="" loading="lazy" onerror="this.src='https://placehold.co/600x400/0f172a/ffffff?text=SilViet+Product'"></div>
+        </div>
     `;
 }
 
@@ -556,55 +613,63 @@ async function loadProducts() {
     } catch (err) {
         console.error('Lỗi tải danh sách sản phẩm:', err.message);
     }
-    // Vẫn render để khách luôn có option "Sản phẩm khác" dù DB lỗi
     renderProductSelects();
 }
 
-// Đổ sản phẩm vào cả 2 dropdown (Quick Finder + RFQ), cuối danh sách là option "Sản phẩm khác"
 function renderProductSelects() {
     const t = i18nData[currentLang] || i18nData.vi;
 
     [
-        { id: 'finderProductSelect', withPacking: false },
-        { id: 'rfqProdSelect',        withPacking: true  }
-    ].forEach(({ id, withPacking }) => {
+        { id: 'finderProductSelect', withPacking: true , grouped: true },
+        { id: 'rfqProdSelect',        withPacking: true,  grouped: true  }
+    ].forEach(({ id, withPacking, grouped }) => {
         const sel = document.getElementById(id);
         if (!sel) return;
 
-        const prev = sel.value; // giữ lại lựa chọn khi đổi ngôn ngữ
+        const prev = sel.value;
         sel.innerHTML = '';
         sel.add(new Option(t.opt_select_prod, ''));
 
-        // Gom sản phẩm theo nhóm (optgroup), thứ tự: nông sản -> đồ uống -> giày dép -> khác
-        const isEnSel = currentLang === 'en';
         const GROUPS = [
-            { key: 'noodles',   vi: 'Nông Sản & Đồ Khô',        en: 'Agricultural & Dry Goods' },
-            { key: 'beverages', vi: 'Đồ Uống & Nước Giải Khát', en: 'Beverages & Refreshments' },
-            { key: 'footwear',  vi: 'Giày Dép & Gia Công OEM',  en: 'Footwear & OEM Manufacturing' }
+            { key: 'noodles',   vi: 'Nông Sản & Đồ Khô',          en: 'Agricultural & Dry Goods' },
+            { key: 'beverages', vi: 'Đồ Uống & Nước Giải Khát',   en: 'Beverages & Refreshments' },
+            { key: 'footwear',  vi: 'Giày Dép & Gia Công OEM',    en: 'Footwear & OEM Manufacturing' }
         ];
+        const isEnSel = currentLang === 'en';
         const makeOption = (item) => {
             const name = (item.name_vi || item.name || item.name_en || 'Sản phẩm xuất khẩu').trim();
             const packing = (withPacking && item.packaging) ? ` (${item.packaging})` : '';
             return new Option(`${name}${packing}`, item.id);
         };
         const known = new Set(GROUPS.map(g => g.key));
-        GROUPS.forEach(g => {
-            const items = globalProducts.filter(p => p.category === g.key);
-            if (items.length === 0) return;
-            const og = document.createElement('optgroup');
-            og.label = isEnSel ? g.en : g.vi;
-            items.forEach(item => og.appendChild(makeOption(item)));
-            sel.appendChild(og);
-        });
-        // Nhóm "Khác": gồm sản phẩm có category lạ (nếu có) + lựa chọn "Sản phẩm khác"
-        const ogOther = document.createElement('optgroup');
-        ogOther.label = isEnSel ? 'Other' : 'Khác';
-        globalProducts.filter(p => !known.has(p.category)).forEach(item => ogOther.appendChild(makeOption(item)));
-        ogOther.appendChild(new Option(t.opt_custom_prod, CUSTOM_PRODUCT_VALUE));
-        sel.appendChild(ogOther);
+        if (grouped) {
+            GROUPS.forEach(g => {
+                const items = globalProducts.filter(p => p.category === g.key || p.category_slug === g.key);
+                if (items.length === 0) return;
+                const og = document.createElement('optgroup');
+                og.label = isEnSel ? g.en : g.vi;
+                items.forEach(item => og.appendChild(makeOption(item)));
+                sel.appendChild(og);
+            });
+            // Nhóm "Khác": sản phẩm có phân loại lạ (nếu có) + lựa chọn "Sản phẩm khác"
+            const ogOther = document.createElement('optgroup');
+            ogOther.label = isEnSel ? 'Other' : 'Khác';
+            globalProducts.filter(p => !known.has(p.category) && !known.has(p.category_slug)).forEach(item => ogOther.appendChild(makeOption(item)));
+            ogOther.appendChild(new Option(t.opt_custom_prod, CUSTOM_PRODUCT_VALUE));
+            sel.appendChild(ogOther);
+        } else {
+            // Danh sách phẳng, không có tiêu đề nhóm
+            globalProducts.forEach(item => sel.add(makeOption(item)));
+            sel.add(new Option(t.opt_custom_prod, CUSTOM_PRODUCT_VALUE));
+        }
 
         if (prev && Array.from(sel.options).some(o => o.value === String(prev))) {
             sel.value = prev;
+        }
+        
+        // Kích hoạt sự kiện cập nhật lại custom dropdown nếu đã được khởi tạo
+        if (typeof sel._svRebuild === 'function') {
+            sel._svRebuild();
         }
     });
 
@@ -612,7 +677,6 @@ function renderProductSelects() {
     handleRFQProductChange();
 }
 
-// Đổ danh sách thị trường vào cả 2 dropdown
 function renderMarketOptions() {
     const isEn = currentLang === 'en';
     const t = i18nData[currentLang] || i18nData.vi;
@@ -626,13 +690,16 @@ function renderMarketOptions() {
         sel.add(new Option(t.opt_select_market, ''));
         TARGET_MARKETS.forEach(m => sel.add(new Option(isEn ? m.en : m.value, m.value)));
         if (prev) sel.value = prev;
+
+        if (typeof sel._svRebuild === 'function') {
+            sel._svRebuild();
+        }
     });
 
     handleQuickMarketChange();
     handleRFQMarketChange();
 }
 
-// Khi chọn "Khác": ô dropdown được thay bằng ô nhập ngay tại chỗ (cùng vị trí, cùng kích thước)
 function applyOtherMode({ selectId, boxId, wrapId, inputId, isOther, required }) {
     const sel = document.getElementById(selectId);
     const box = document.getElementById(boxId);
@@ -649,7 +716,6 @@ function applyOtherMode({ selectId, boxId, wrapId, inputId, isOther, required })
     }
 }
 
-// Bấm mũi tên ở ô nhập -> quay lại dropdown chọn từ danh sách
 function backToList(selectId) {
     const sel = document.getElementById(selectId);
     if (!sel) return;
@@ -670,7 +736,6 @@ function handleRFQMarketChange() {
         inputId: 'rfqMarketCustom', isOther: !!sel && sel.value === OTHER_MARKET_VALUE, required: true });
 }
 
-// Lấy giá trị thị trường cuối cùng (nếu "khác" thì ghép với nội dung khách nhập)
 function getMarketValue(selectId, inputId) {
     const sel = document.getElementById(selectId);
     if (!sel || sel.value === '') return '';
@@ -686,7 +751,6 @@ function getMarketValue(selectId, inputId) {
 const FINDER_BTN_ACTIVE = "w-full bg-gradient-to-r from-brand-blue to-brand-emerald hover:brightness-110 active:scale-[0.99] text-white font-bold py-3.5 rounded-xl shadow-lg shadow-brand-emerald/10 transition-all flex items-center justify-center gap-2 mt-2 text-xs cursor-pointer";
 const FINDER_BTN_DISABLED = "w-full bg-slate-700 text-slate-400 opacity-50 cursor-not-allowed py-3.5 rounded-xl shadow-lg transition-all flex items-center justify-center gap-2 mt-2 text-xs";
 
-// Mở khóa nút khi đã chọn sản phẩm (hoặc đã nhập sản phẩm tự do)
 function checkFinderFormValid() {
     const prodSelect = document.getElementById('finderProductSelect');
     const customInput = document.getElementById('finderCustomProduct');
@@ -701,7 +765,6 @@ function checkFinderFormValid() {
     submitBtn.className = valid ? FINDER_BTN_ACTIVE : FINDER_BTN_DISABLED;
 }
 
-// Gõ sản phẩm tự do (hoặc dán/autofill) -> mở khóa nút ngay, không cần chọn lại dropdown
 document.addEventListener('DOMContentLoaded', () => {
     const customInput = document.getElementById('finderCustomProduct');
     if (customInput) {
@@ -712,7 +775,6 @@ document.addEventListener('DOMContentLoaded', () => {
     checkFinderFormValid();
 });
 
-// Khi đổi sản phẩm trên Quick Finder: chọn "Sản phẩm khác" thì ô chọn đổi thành ô nhập
 function handleQuickProductChange() {
     const prodSelect = document.getElementById('finderProductSelect');
     if (!prodSelect) return;
@@ -723,7 +785,6 @@ function handleQuickProductChange() {
     checkFinderFormValid();
 }
 
-// Bấm "Nhận Báo Giá (RFQ)" ở Quick Finder -> đồng bộ sang Form RFQ phía dưới và cuộn xuống
 function handleHeroFinder(event) {
     event.preventDefault();
     const t = i18nData[currentLang] || i18nData.vi;
@@ -744,11 +805,9 @@ function handleHeroFinder(event) {
         return;
     }
 
-    // 1. Reset form RFQ trước khi điền dữ liệu mới
     const mainForm = document.getElementById('rfqMainForm');
     if (mainForm) mainForm.reset();
 
-    // 2. Đồng bộ sản phẩm (có sẵn hoặc tự nhập)
     const rfqProdSelect = document.getElementById('rfqProdSelect');
     if (rfqProdSelect) {
         rfqProdSelect.value = finderProdSelect.value;
@@ -759,7 +818,6 @@ function handleHeroFinder(event) {
         }
     }
 
-    // 3. Đồng bộ thị trường đích
     const rfqTargetMarket = document.getElementById('rfqTargetMarket');
     if (quickMarketSelect && quickMarketSelect.value !== '' && rfqTargetMarket) {
         rfqTargetMarket.value = quickMarketSelect.value;
@@ -773,13 +831,11 @@ function handleHeroFinder(event) {
         handleRFQMarketChange();
     }
 
-    // 4. Cuộn xuống form RFQ
     scrollToRFQ();
 }
 
 // ================= 7. RFQ FORM =================
 
-// Khi đổi sản phẩm trong RFQ: chọn "Sản phẩm khác" thì ô chọn đổi thành ô nhập
 function handleRFQProductChange() {
     const sel = document.getElementById('rfqProdSelect');
     if (!sel) return;
@@ -788,7 +844,6 @@ function handleRFQProductChange() {
         inputId: 'rfqCustomProduct', isOther: sel.value === CUSTOM_PRODUCT_VALUE, required: true });
 }
 
-// ---- Popup "Gửi thành công" nổi bật + trạng thái nút khi gửi ----
 let rfqSubmitting = false;
 
 function ensureRfqToastStyle() {
@@ -847,10 +902,10 @@ function showRfqSuccessPopup(texts, isEn) {
 
 async function handleMainRFQSubmit(event) {
     event.preventDefault();
-    if (rfqSubmitting) return; // chặn bấm đúp
+    if (rfqSubmitting) return;
 
     const alertBox = document.getElementById('rfqAlertBox');
-    if (alertBox) alertBox.classList.add('hidden'); // xóa thông báo của lần gửi trước
+    if (alertBox) alertBox.classList.add('hidden');
 
     const submitBtn = document.querySelector('#rfqMainForm button[type="submit"]');
     const submitBtnHtml = submitBtn ? submitBtn.innerHTML : '';
@@ -922,7 +977,6 @@ async function handleMainRFQSubmit(event) {
         handleRFQProductChange();
         handleRFQMarketChange();
 
-        // Hộp thông báo to, rõ ràng thay cho banner nhỏ cũ
         showRfqSuccessPopup(texts, isEn);
 
     } catch (err) {
@@ -942,14 +996,19 @@ async function handleMainRFQSubmit(event) {
 
 document.addEventListener('DOMContentLoaded', () => {
     const video = document.getElementById("companyIntroVideo");
-    if (video) {
-        video.muted = true; 
-        video.pause();
+    if (video) { video.muted = true; video.pause(); }
+
+    if (sessionStorage.getItem('introSeen')) {   // đã xem rồi -> bỏ qua ngay
+        const intro = document.getElementById("introSplash");
+        if (intro) intro.remove();
+        if (video) video.play().catch(() => {});
+        return;
     }
-    setTimeout(() => { finishIntro(); }, 4500);
+    setTimeout(() => { finishIntro(); }, 200);
 });
 
 function finishIntro() {
+    try { sessionStorage.setItem('introSeen', '1'); } catch (e) {}
     const intro = document.getElementById("introSplash");
     const video = document.getElementById("companyIntroVideo");
 
@@ -988,7 +1047,7 @@ function toggleAudio() {
     }
 }
 
-// ================= 9. CUSTOM DROPDOWN (thay menu xổ xuống mặc định cho đẹp) =================
+// ================= 9. CUSTOM DROPDOWN (ĐÃ FIX LỖI KẸT & CHE KHUẤT) =================
 (function () {
     const CSS = `
     .sv-dd { position: relative; width: 100%; }
@@ -1003,10 +1062,10 @@ function toggleAudio() {
     .sv-dd-label { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .sv-dd-chev { flex: none; width: 16px; height: 16px; color: #94a3b8; transition: transform .2s; }
     .sv-dd.open .sv-dd-chev { transform: rotate(180deg); color: #0b5fa5; }
-    .sv-dd-panel { position: fixed; left: 0; top: 0; z-index: 9999; display: none;
-        max-height: 300px; overflow-y: auto; padding: 6px; border-radius: 14px; background: #ffffff;
-        border: 1px solid #e2e8f0; box-shadow: 0 16px 40px -8px rgba(15,23,42,.25); }
-    .sv-dd-panel.sv-open { display: block; animation: svDdIn .14s ease-out; }
+    .sv-dd-panel { position: fixed; z-index: 9999; display: none;
+        max-height: 360px; overflow-y: auto; padding: 6px; border-radius: 14px; background: #ffffff;
+        border: 1px solid #e2e8f0; box-shadow: 0 16px 40px -8px rgba(15,23,42,.28); }
+    .sv-dd-panel.open { display: block; animation: svDdIn .14s ease-out; }
     @keyframes svDdIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
     .sv-dd-group { padding: 12px 10px 4px; font-size: 1.1em; font-weight: 800; letter-spacing: .03em; text-transform: uppercase; color: #0b5fa5; }
     .sv-dd-item { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 9px 10px;
@@ -1017,7 +1076,7 @@ function toggleAudio() {
     .sv-dd-item.selected { color: #0b5fa5; font-weight: 600; }
     .sv-dd-check { flex: none; width: 15px; height: 15px; color: #0b5fa5; opacity: 0; }
     .sv-dd-item.selected .sv-dd-check { opacity: 1; }
-    .sv-dd-panel::-webkit-scrollbar { width: 8px; }
+    .sv-dd-panel::-webkit-scrollbar { width: 6px; }
     .sv-dd-panel::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 8px; }
     .dark .sv-dd-btn { color: #f8fafc; background: rgba(2,6,23,.9); border-color: #334155; }
     .dark .sv-dd-btn:hover, .dark .sv-dd.open .sv-dd-btn { border-color: #34d399; }
@@ -1045,7 +1104,6 @@ function toggleAudio() {
         sel.classList.add('sv-native');
         sel.tabIndex = -1;
 
-        // Bỏ mũi tên cũ (nếu có) vì nút mới đã có mũi tên riêng
         const old = wrap.nextElementSibling;
         if (old && old.classList.contains('pointer-events-none') && old.querySelector('[data-lucide="chevron-down"]')) old.remove();
 
@@ -1064,9 +1122,10 @@ function toggleAudio() {
         panel.setAttribute('role', 'listbox');
 
         wrap.appendChild(btn);
-        wrap.appendChild(panel);
+        // Panel nằm ở <body> để không bị card (overflow/transform) cắt hoặc che
+        document.body.appendChild(panel);
 
-        let items = [];   // { el, opt }
+        let items = [];
         let activeIdx = -1;
 
         function refreshLabel() {
@@ -1108,6 +1167,29 @@ function toggleAudio() {
             refreshLabel();
         }
 
+        sel._svRebuild = build;
+
+        function positionPanel() {
+            const r = btn.getBoundingClientRect();
+            const cs = getComputedStyle(btn);
+            panel.style.fontSize = cs.fontSize; panel.style.fontFamily = cs.fontFamily;   // chữ trong khung bằng chữ của ô chọn
+            const spaceBelow = window.innerHeight - r.bottom - 12;
+            const spaceAbove = r.top - 12;
+
+            panel.style.left = r.left + 'px';
+            panel.style.width = r.width + 'px';
+
+            if (spaceBelow < 240 && spaceAbove > spaceBelow) {
+                panel.style.top = 'auto';
+                panel.style.bottom = (window.innerHeight - r.top + 6) + 'px';
+                panel.style.maxHeight = Math.min(360, spaceAbove) + 'px';
+            } else {
+                panel.style.bottom = 'auto';
+                panel.style.top = (r.bottom + 6) + 'px';
+                panel.style.maxHeight = Math.min(360, Math.max(180, spaceBelow)) + 'px';
+            }
+        }
+
         function setActive(i, scroll) {
             if (i < 0 || i >= items.length) return;
             items.forEach(it => it.el.classList.remove('active'));
@@ -1120,51 +1202,24 @@ function toggleAudio() {
 
         function open() {
             if (isOpen() || sel.disabled) return;
-            document.querySelectorAll('.sv-dd.open').forEach(d => d.classList.remove('open'));
-            document.querySelectorAll('.sv-dd-panel.sv-open').forEach(p => p.classList.remove('sv-open'));   // đóng ô khác đang mở
+            document.querySelectorAll('.sv-dd.open, .sv-dd-panel.open').forEach(d => d.classList.remove('open'));
             wrap.classList.add('open');
-            document.body.appendChild(panel);      // thoát khỏi mọi thẻ cha cắt/che
-            panel.classList.add('sv-open');
-            place();
-            window.addEventListener('scroll', place, true);
-            window.addEventListener('resize', place);
+            panel.classList.add('open');
             btn.setAttribute('aria-expanded', 'true');
+            positionPanel();
             const cur = items.findIndex(i => i.opt === sel.options[sel.selectedIndex]);
             setActive(cur >= 0 ? cur : 0, true);
         }
 
-        // Đặt khung xổ xuống theo toạ độ màn hình (position: fixed) -> không bị thẻ cha cắt
-        function place(ev) {
-            if (!isOpen()) return;
-            if (ev && ev.target && ev.target !== document && panel.contains(ev.target)) return;   // cuộn trong khung thì giữ nguyên
-            const r = btn.getBoundingClientRect();
-            const below = window.innerHeight - r.bottom - 14;
-            const above = r.top - 14;
-            const up = below < 240 && above > below;
-            const maxH = Math.max(140, Math.min(300, up ? above : below));
-            const cs = getComputedStyle(btn);
-            panel.style.fontSize = cs.fontSize; panel.style.fontFamily = cs.fontFamily;
-            panel.style.position = 'fixed';
-            panel.style.left = r.left + 'px';
-            panel.style.right = 'auto';
-            panel.style.width = r.width + 'px';
-            panel.style.maxHeight = maxH + 'px';
-            if (up) { panel.style.top = 'auto'; panel.style.bottom = (window.innerHeight - r.top + 6) + 'px'; }
-            else    { panel.style.bottom = 'auto'; panel.style.top = (r.bottom + 6) + 'px'; }
-        }
-
         function close() {
-            window.removeEventListener('scroll', place, true);
-            window.removeEventListener('resize', place);
             wrap.classList.remove('open');
-            panel.classList.remove('sv-open');
-            wrap.appendChild(panel);
+            panel.classList.remove('open');
             btn.setAttribute('aria-expanded', 'false');
         }
 
         function choose(opt) {
-            sel.value = opt.value;                                   // đã được patch -> tự cập nhật nhãn
-            sel.dispatchEvent(new Event('change', { bubbles: true })); // để onchange cũ vẫn chạy
+            sel.value = opt.value;
+            sel.dispatchEvent(new Event('change', { bubbles: true }));
             close();
             btn.focus();
         }
@@ -1186,9 +1241,11 @@ function toggleAudio() {
             else if (e.key === 'Escape') { close(); }
             else if (e.key === 'Tab') { close(); }
         });
+
+        window.addEventListener('scroll', e => { if (isOpen() && !panel.contains(e.target)) positionPanel(); }, true);
+        window.addEventListener('resize', () => { if (isOpen()) positionPanel(); });
         document.addEventListener('click', e => { if (!wrap.contains(e.target) && !panel.contains(e.target)) close(); });
 
-        // Đồng bộ khi code khác đổi giá trị / đổ lại danh sách option
         Object.defineProperty(sel, 'value', {
             configurable: true,
             get() { return nativeValue.get.call(this); },
